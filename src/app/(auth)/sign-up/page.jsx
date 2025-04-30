@@ -14,10 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Axios from '@/lib/Axios';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 const formSchema = z
   .object({
@@ -158,7 +158,7 @@ const SignUp = () => {
           <Button
             disabled={isLoading}
             type="submit"
-            className="w-full cursor-pointer bg-primary-100"
+            className="w-full cursor-pointer bg-primary-100/80 hover:bg-primary-100"
           >
             {isLoading ? 'Loading...' : 'Create Account'}
           </Button>
@@ -168,8 +168,11 @@ const SignUp = () => {
       <div className="max-w-md mx-auto">
         <p>
           Already have account ?{' '}
-          <Link href={'/login'} className="text-primary-500 drop-shadow-md">
-            Login
+          <Link
+            href={'/sign-in'}
+            className="text-primary-500/80 drop-shadow-md hover:text-primary-500"
+          >
+            Sign In
           </Link>
         </p>
       </div>

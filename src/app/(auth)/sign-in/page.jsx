@@ -49,14 +49,16 @@ const SignIn = () => {
       toast.error(result.error);
     } else {
       toast.success('Login Successfully.');
-      router.push('/dashboard');
+      router.push('/ask-question');
     }
     setIsLoading(false);
   }
 
   return (
     <div className="lg:p-10 space-y-7">
-      <h1 className="text-xl font-semibold text-center">Login</h1>
+      <h1 className="text-xl font-semibold text-center text-primary-100">
+        Login
+      </h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onFormSubmit)}
@@ -67,7 +69,7 @@ const SignIn = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className={'text-primary-500'}>Email</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter your Email"
@@ -85,7 +87,7 @@ const SignIn = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className={'text-primary-500'}>Password</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter your Password"
@@ -107,7 +109,7 @@ const SignIn = () => {
           </div>
           <Button
             disabled={isLoading}
-            className="w-full cursor-pointer"
+            className="w-full cursor-pointer bg-primary-100/80 hover:bg-primary-100"
             type="submit"
           >
             {isLoading ? 'Loading..' : 'Login'}
@@ -117,8 +119,8 @@ const SignIn = () => {
       <div className="max-w-md mx-auto">
         <p>
           Don't have account?{' '}
-          <Link href={'/register'} className="text-primary drop-shadow-md">
-            Register
+          <Link href={'/sign-up'} className="text-primary drop-shadow-md">
+            Sign Up
           </Link>
         </p>
       </div>
