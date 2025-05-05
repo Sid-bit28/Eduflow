@@ -7,11 +7,11 @@ export default withAuth(
 
     // if the user is logged in and tries to access the login, register page
     if (
-      token &&  
+      token &&
       (req.nextUrl.pathname === '/sign-in' ||
         req.nextUrl.pathname === '/sign-up')
     ) {
-      return NextResponse.redirect(new URL('/ask-question', req.url));
+      return NextResponse.redirect(new URL('/', req.url));
     }
     return NextResponse.next();
   },
@@ -29,5 +29,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/ask-question', '/sign-in', '/sign-up'],
+  matcher: ['/', '/ask-question', '/sign-in', '/sign-up'],
 };

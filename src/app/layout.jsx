@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/context/ThemeProvider';
 import './globals.css';
 import Provider from '@/Provider/Provider';
 import { Toaster } from 'sonner';
@@ -15,8 +16,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={''}>
-        <Provider>{children}</Provider>
-        <Toaster />
+        <ThemeProvider>
+          <Provider>{children}</Provider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
