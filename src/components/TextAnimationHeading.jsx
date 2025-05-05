@@ -12,14 +12,14 @@ const TextAnimationHeading = ({ className, classNameAnimationContainer }) => {
         className
       )}
     >
-      <div className="text-primary-100 drop-shadow-md">Ask</div>
+      <div className="text-primary-100 drop-shadow-md pl-7">Ask</div>
       <div className={cn('w-fit text-center', classNameAnimationContainer)}>
         <TypeAnimation
           sequence={[
             // Same substring at the start will only be typed out once, initially
             'Community 🙌',
             1000, // wait 1s before replacing "Mice" with "Hamsters"
-            'Developer 🔖',
+            'Developers 🔖',
             1000,
             'EduFlow 👋',
             1000,

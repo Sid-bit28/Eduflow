@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Grotesk:wght@300..700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -30,7 +32,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --shadow-light-100: 0px 12px 20px 0px rgba(184, 184, 184, 0.03),
+  --shadow-light-100:
+    0px 12px 20px 0px rgba(184, 184, 184, 0.03),
     0px 6px 12px 0px rgba(184, 184, 184, 0.02),
     0px 2px 4px 0px rgba(184, 184, 184, 0.03);
   --shadow-light-200: 10px 10px 20px 0px rgba(218, 213, 213, 0.1);
@@ -42,9 +45,16 @@
   --background-image-auth-light: url('/images/auth-light.png');
 
   --breakpoint-xs: 420px;
+}
 
-  --font-inter: var(--font-inter);
-  --font-space-grotesk: var(--font-space-grotesk);
+@layer base {
+  html {
+    font-family: 'Poppins', 'sans-serif';
+  }
+
+  body {
+    overflow-x: hidden;
+  }
 }
 
 /*

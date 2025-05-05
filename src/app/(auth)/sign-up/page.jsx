@@ -26,10 +26,10 @@ const formSchema = z
     password: z
       .string({ message: 'Password is required' })
       .min(8, { message: 'Password must at least 8 characters' })
-      .regex(/[A-z]/, 'Password at leat One Uppercase')
-      .regex(/[a-z]/, 'Password at least one lowercase')
-      .regex(/[0-9]/, 'Password at least one number')
-      .regex(/[@#$%^&*]/, 'Password at least one special character'),
+      .regex(/[A-Z]/, 'Password at least One Uppercase')
+      .regex(/[a-z]/, 'Password at least One Lowercase')
+      .regex(/[0-9]/, 'Password at least One Number')
+      .regex(/[@#$%^&*]/, 'Password at least One Special Character'),
     confirmPassword: z.string({ message: 'Confirm password is required' }),
   })
   .refine(data => data.password === data.confirmPassword, {

@@ -5,7 +5,7 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
 
-    // if the user is logged and tries to access the login, register page
+    // if the user is logged in and tries to access the login, register page
     if (
       token &&  
       (req.nextUrl.pathname === '/sign-in' ||
