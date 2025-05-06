@@ -49,7 +49,7 @@ const SignUp = () => {
     console.log(values);
     const payload = {
       name: values.name,
-      email: values.email,
+      email: values.email.toLowerCase(),
       password: values.password,
     };
 
@@ -71,7 +71,7 @@ const SignUp = () => {
 
   return (
     <div className="lg:p-10 space-y-7">
-      <h1 className="text-xl font-semibold text-center text-primary-100">
+      <h1 className="text-xl font-semibold text-center text-primary-500">
         Create Account
       </h1>
       <Form {...form}>
@@ -158,7 +158,7 @@ const SignUp = () => {
           <Button
             disabled={isLoading}
             type="submit"
-            className="w-full cursor-pointer bg-primary-100/80 hover:bg-primary-100"
+            className="w-full cursor-pointer primary-gradient rounded-lg text-light-900"
           >
             {isLoading ? 'Loading...' : 'Create Account'}
           </Button>

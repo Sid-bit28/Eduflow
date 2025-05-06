@@ -6,19 +6,19 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-primary-100: #6f36bb;
-  --color-primary-500: #311650;
+  --color-primary-100: #fff1e6;
+  --color-primary-500: #ff7000;
 
-  --color-dark-100: #311650;
-  --color-dark-200: #4b257f;
-  --color-dark-300: #4b3366;
-  --color-dark-400: #65507c;
-  --color-dark-500: #6f36bb;
+  --color-dark-100: #000000;
+  --color-dark-200: #0f1117;
+  --color-dark-300: #151821;
+  --color-dark-400: #212734;
+  --color-dark-500: #101012;
 
-  --color-light-400: #1c122a;
-  --color-light-500: #c799fd;
+  --color-light-400: #858ead;
+  --color-light-500: #7b8ec8;
   --color-light-700: #dce3f1;
-  --color-light-800: #ede5f7;
+  --color-light-800: #f4f6f8;
   --color-light-850: #fdfdfd;
   --color-light-900: #ffffff;
 
@@ -253,7 +253,7 @@
 }
 
 @utility invert-colors {
-  @apply invert dark:invert-0;
+  @apply dark:invert-0 invert-0;
 }
 
 @utility shadow-light100_dark100 {

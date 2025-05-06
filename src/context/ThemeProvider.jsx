@@ -5,20 +5,26 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState('');
+  // true->light
+  // false->dark
+  const [mode, setMode] = useState();
 
   const handleThemeChange = () => {
-    if (mode === 'dark') {
-      setMode('light');
-      document.documentElement.classList.add('light');
-    } else {
-      setMode('dark');
+    if (
+      localStorage.theme === 'dark' ||
+      (!('theme' in localStorage) &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      setMode(false);
       document.documentElement.classList.add('dark');
+    } else {
+      setMode(true);
+      document.documentElement.classList.remove('dark');
     }
   };
 
   useEffect(() => {
-    // handleThemeChange();
+    handleThemeChange();
   }, [mode]);
 
   return (

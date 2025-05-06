@@ -40,7 +40,7 @@ const SignIn = () => {
   async function onFormSubmit(values) {
     setIsLoading(true);
     const result = await signIn('credentials', {
-      email: values.email,
+      email: values.email.toLowerCase(),
       password: values.password,
       redirect: false,
     });
@@ -56,7 +56,7 @@ const SignIn = () => {
 
   return (
     <div className="lg:p-10 space-y-7">
-      <h1 className="text-xl font-semibold text-center text-primary-100">
+      <h1 className="text-xl font-semibold text-center text-primary-500">
         Login
       </h1>
       <Form {...form}>
@@ -109,7 +109,7 @@ const SignIn = () => {
           </div>
           <Button
             disabled={isLoading}
-            className="w-full cursor-pointer bg-primary-100/80 hover:bg-primary-100"
+            className="w-full cursor-pointer primary-gradient rounded-lg text-light-900"
             type="submit"
           >
             {isLoading ? 'Loading..' : 'Login'}
@@ -119,7 +119,7 @@ const SignIn = () => {
       <div className="max-w-md mx-auto">
         <p>
           Don't have account?{' '}
-          <Link href={'/sign-up'} className="text-primary drop-shadow-md">
+          <Link href={'/sign-up'} className="text-primary-500 drop-shadow-md">
             Sign Up
           </Link>
         </p>

@@ -19,7 +19,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
-        if (pathname === '/sign-in' || pathname === '/sign-up') {
+        if (
+          pathname === '/sign-in' ||
+          pathname === '/sign-up' ||
+          pathname === '/'
+        ) {
           return true;
         }
         return !!token;
@@ -29,5 +33,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/', '/ask-question', '/sign-in', '/sign-up'],
+  matcher: ['/', '/sign-in', '/sign-up'],
 };

@@ -8,11 +8,11 @@ const TextAnimationHeading = ({ className, classNameAnimationContainer }) => {
   return (
     <div
       className={cn(
-        'mx-auto text-2xl lg:text-5xl my-6 flex flex-col gap-3 lg:gap-5 font-bold text-center',
+        'mx-auto text-2xl lg:text-5xl my-6 flex flex-col gap-3 lg:gap-5 font-bold text-center ',
         className
       )}
     >
-      <div className="text-primary-100 drop-shadow-md pl-7">Ask</div>
+      <div className="text-primary-500 drop-shadow-md pl-7">Ask</div>
       <div className={cn('w-fit text-center', classNameAnimationContainer)}>
         <TypeAnimation
           sequence={[
