@@ -21,7 +21,7 @@ const MobileNav = () => {
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
+      <SheetTrigger asChild className="md:hidden">
         <svg
           className="w-6 h-6"
           fill="none"
@@ -66,7 +66,9 @@ const MobileNav = () => {
         </SheetDescription>
         <div className="no-scrollbar flex grow flex-col justify-between overflow-y-auto">
           <SheetClose asChild>
-            <NavLinks />
+            <div className="flex flex-1 flex-col gap-2">
+              <NavLinks isMobileNav userId={session?.data?.user?.id} />
+            </div>
           </SheetClose>
         </div>
         <div>
