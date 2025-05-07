@@ -54,7 +54,14 @@ const LeftSidebar = () => {
             className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none cursor-pointer"
             onClick={() => signOut()}
           >
-            <span className="primary-text-gradient">LogOut</span>
+            <Image
+              src={'/icons/trash.svg'}
+              alt="login"
+              width={20}
+              height={20}
+              className="invert-colors lg:hidden"
+            />
+            <span className="primary-text-gradient max-lg:hidden">LogOut</span>
           </Button>
         )}
       </div>

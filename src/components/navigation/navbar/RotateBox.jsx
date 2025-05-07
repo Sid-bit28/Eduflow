@@ -1,15 +1,15 @@
 'use client';
 
 import { useTheme } from '@/context/ThemeProvider';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function RotateBox({ children }) {
   const { mode, setMode } = useTheme();
-  const [rotated, setRotated] = useState(false);
+  const [rotated, setRotated] = useState();
 
   const handleClick = () => {
-    setRotated(!rotated);
     setMode(!mode);
+    setRotated(!rotated);
     if (mode) {
       localStorage.theme = 'dark';
     } else localStorage.theme = 'light';
