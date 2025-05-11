@@ -1,3 +1,4 @@
+import QuestionCard from '@/components/cards/QuestionCard';
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
 import NoResult from '@/components/NoResult';
@@ -72,7 +73,19 @@ const Page = () => {
 
       <section className="mt-10 flex w-full flex-col gap-6">
         {questions.length > 0 ? (
-          questions.map(question => 'Question Card')
+          questions.map(question => (
+            <QuestionCard
+              key={question._id}
+              _id={question._id}
+              title={question.title}
+              tags={question.tags}
+              author={question.author}
+              upvotes={question.upvotes}
+              views={question.views}
+              answers={question.answers}
+              createdAt={question.createdAt}
+            />
+          ))
         ) : (
           <NoResult
             title="There's no questions to show."
