@@ -1,5 +1,6 @@
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
+import NoResult from '@/components/NoResult';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
@@ -70,9 +71,19 @@ const Page = () => {
       <HomeFilter filters={HomePageFilters} />
 
       <section className="mt-10 flex w-full flex-col gap-6">
-        {questions.length > 0
-          ? questions.map(question => 'Question Card')
-          : 'No Questions'}
+        {questions.length > 0 ? (
+          questions.map(question => 'Question Card')
+        ) : (
+          <NoResult
+            title="There's no questions to show."
+            description="Be the first to ask questions and activate the community. Ask a
+        delightful as curious question regarding any techincal stuff you want to
+        know and the community will help. Get involved and build the next great
+        thing 🚀."
+            link={ROUTES.ASK_QUESTION}
+            linkTitle="Ask a Question"
+          />
+        )}
       </section>
     </>
   );
