@@ -20,21 +20,11 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-
-const formSchema = z.object({
-  email: z.string({ message: 'Email is required.' }).email().min(5).max(50),
-  password: z
-    .string({ message: 'Password is required.' })
-    .min(8, { message: 'Password must be atleast 8 characters.' })
-    .regex(/[A-Z]/, 'Password should have least One Uppercase')
-    .regex(/[a-z]/, 'Password should have atleast One Lowercase')
-    .regex(/[0-9]/, 'Password should have atleast One Number.')
-    .regex(/[@#$%^&*]/, 'Password should have atleast One Special Character.'),
-});
+import { SignInSchema } from '@/lib/Validations';
 
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm({ resolver: zodResolver(formSchema) });
+  const form = useForm({ resolver: zodResolver(SignInSchema) });
   const router = useRouter();
 
   async function onFormSubmit(values) {

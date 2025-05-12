@@ -19,15 +19,12 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import Axios from '@/lib/Axios';
-
-const formSchema = z.object({
-  email: z.string({ message: 'Email is required.' }).email().min(5).max(50),
-});
+import { ForgotPasswordSchema } from '@/lib/Validations';
 
 const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(ForgotPasswordSchema),
   });
 
   async function onFormSubmit(values) {

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -18,28 +17,11 @@ import { useRouter } from 'next/navigation';
 import Axios from '@/lib/Axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-
-const formSchema = z
-  .object({
-    name: z.string({ message: 'Name is required' }).min(3),
-    email: z.string({ message: 'Email is required' }).email().min(5).max(50),
-    password: z
-      .string({ message: 'Password is required' })
-      .min(8, { message: 'Password must at least 8 characters' })
-      .regex(/[A-Z]/, 'Password at least One Uppercase')
-      .regex(/[a-z]/, 'Password at least One Lowercase')
-      .regex(/[0-9]/, 'Password at least One Number')
-      .regex(/[@#$%^&*]/, 'Password at least One Special Character'),
-    confirmPassword: z.string({ message: 'Confirm password is required' }),
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: 'Password and confirm password must be same',
-    path: ['confirmPassword'],
-  });
+import { SignUpSchema } from '@/lib/Validations';
 
 const SignUp = () => {
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(SignUpSchema),
   });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

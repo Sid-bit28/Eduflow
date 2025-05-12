@@ -18,26 +18,11 @@ import Axios from '@/lib/Axios';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
-
-const formSchema = z
-  .object({
-    password: z
-      .string({ message: 'Password is required' })
-      .min(8, { message: 'Password must at least 8 characters' })
-      .regex(/[A-Z]/, 'Password at leat One Uppercase')
-      .regex(/[a-z]/, 'Password at least one lowercase')
-      .regex(/[0-9]/, 'Password at least one number')
-      .regex(/[@#$%^&*]/, 'Password at least one special character'),
-    confirmPassword: z.string({ message: 'Confirm password is required' }),
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: 'Password and confirm password must be same',
-    path: ['confirmPassword'],
-  });
+import { ResetPasswordSchema } from '@/lib/Validations';
 
 const ResetPassword = () => {
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(ResetPasswordSchema),
   });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
