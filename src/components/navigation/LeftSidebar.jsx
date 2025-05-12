@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '../ui/button';
 import { signOut, useSession } from 'next-auth/react';
 import NavLinks from './navbar/NavLinks';
-import { SheetClose } from '../ui/sheet';
 import ROUTES from '@/constants/routes';
 import Image from 'next/image';
 
@@ -22,7 +21,7 @@ const LeftSidebar = () => {
             <Link href={ROUTES.SIGN_IN}>
               <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none cursor-pointer">
                 <Image
-                  src={'/icons/account.svg'}
+                  src="/icons/account.svg"
                   alt="login"
                   width={20}
                   height={20}
@@ -37,7 +36,7 @@ const LeftSidebar = () => {
             <Link href={ROUTES.SIGN_UP}>
               <Button className="small-medium light-border-2 btn-tertiary text-dark400_light900 min-h-[41px] w-full rounded-lg border px-4 py-3 shadow-none cursor-pointer">
                 <Image
-                  src={'/icons/sign-up.svg'}
+                  src="/icons/sign-up.svg"
                   alt="login"
                   width={20}
                   height={20}
