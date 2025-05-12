@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
+    "@mdxeditor/editor": "^3.32.2",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.12",
     "@radix-ui/react-label": "^2.1.4",
@@ -21,6 +22,7 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cm6-theme-basic-dark": "^0.2.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.503.0",
     "mongoose": "^8.14.1",
