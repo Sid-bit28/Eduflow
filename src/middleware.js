@@ -33,5 +33,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/', '/sign-in', '/sign-up'],
+  matcher: ['/', '/sign-in', '/sign-up', '/ask-question'],
 };

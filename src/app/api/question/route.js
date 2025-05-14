@@ -2,8 +2,42 @@ import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
+import UserModel from '@/models/User.Model';
 import { getServerSession } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
+
+export async function GET(request) {
+  try {
+    await connectDB();
+    const questions = await QuestionModel.find({})
+      .populate({
+        path: 'tags',
+        model: TagModel,
+      })
+      .populate({ path: 'author', model: UserModel });
+
+    return NextResponse.json(
+      {
+        message: 'Questions fetched successfully.',
+        questions,
+      },
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch Questions.',
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
 
 export async function POST(request) {
   try {
@@ -11,7 +45,7 @@ export async function POST(request) {
     if (!session) {
       return NextResponse.json(
         {
-          error: 'Unauthorized',
+          error: 'User Unauthorized',
         },
         {
           status: 401,
@@ -20,7 +54,7 @@ export async function POST(request) {
     }
     const author = session?.user?.id;
 
-    const { title, content, tags } = await request.json();
+    const { title, content, tags, path } = await request.json();
     console.log(title, content, tags);
 
     if (!title || !content || !tags) {

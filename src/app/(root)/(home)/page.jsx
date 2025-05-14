@@ -1,3 +1,5 @@
+'use client';
+
 import QuestionCard from '@/components/cards/QuestionCard';
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
@@ -6,47 +8,34 @@ import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
+import Axios from '@/lib/Axios';
 import Link from 'next/link';
-import React from 'react';
-
-const questions = [
-  {
-    _id: 1,
-    title: 'Cascading Deletes in SQLAlchemy',
-    tags: [
-      { _id: 1, name: 'python' },
-      { _id: 2, name: 'SQL' },
-    ],
-    author: {
-      _id: 1,
-      name: 'John Doe',
-      picture: 'john-doe.jpg',
-    },
-    upvotes: 10,
-    views: 100,
-    answers: [],
-    createdAt: new Date('2021-09-01T12:00:00.000Z'),
-  },
-  {
-    _id: 2,
-    title: 'How to center a div?',
-    tags: [
-      { _id: 1, name: 'python' },
-      { _id: 2, name: 'SQL' },
-    ],
-    author: {
-      _id: 1,
-      name: 'John Doe',
-      picture: 'john-doe.jpg',
-    },
-    upvotes: 10,
-    views: 100,
-    answers: [],
-    createdAt: new Date('2021-09-01T12:00:00.000Z'),
-  },
-];
+import React, { useEffect, useState } from 'react';
 
 const Page = () => {
+  const [questions, setQuestions] = useState([]);
+  const [isloading, setIsLoading] = useState(false);
+
+  const fetchQuestions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await Axios.get('/api/question');
+      console.log('response', response);
+      if (response.status === 200) {
+        const questions = response?.data?.questions;
+        setQuestions(questions || []);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
