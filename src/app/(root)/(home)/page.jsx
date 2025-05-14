@@ -1,5 +1,3 @@
-'use client';
-
 import QuestionCard from '@/components/cards/QuestionCard';
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
@@ -10,31 +8,34 @@ import { HomePageFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
 import Axios from '@/lib/Axios';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-const Page = () => {
-  const [questions, setQuestions] = useState([]);
-  const [isloading, setIsLoading] = useState(false);
+const Page = async () => {
+  // Fetching questions from the API using Server Side Rendering (SSR)
+  const response = await Axios.get('/api/question');
+  const questions = response?.data?.questions || [];
+  // const [questions, setQuestions] = useState([]);
+  // const [isloading, setIsLoading] = useState(false);
 
-  const fetchQuestions = async () => {
-    try {
-      setIsLoading(true);
-      const response = await Axios.get('/api/question');
-      console.log('response', response);
-      if (response.status === 200) {
-        const questions = response?.data?.questions;
-        setQuestions(questions || []);
-      }
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const fetchQuestions = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await Axios.get('/api/question');
+  //     console.log('response', response);
+  //     if (response.status === 200) {
+  //       const questions = response?.data?.questions;
+  //       setQuestions(questions || []);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching questions:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
+  // useEffect(() => {
+  //   fetchQuestions();
+  // }, []);
 
   return (
     <>

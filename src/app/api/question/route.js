@@ -15,7 +15,8 @@ export async function GET(request) {
         path: 'tags',
         model: TagModel,
       })
-      .populate({ path: 'author', model: UserModel });
+      .populate({ path: 'author', model: UserModel })
+      .sort({ createdAt: -1 });
 
     return NextResponse.json(
       {
@@ -55,7 +56,7 @@ export async function POST(request) {
     const author = session?.user?.id;
 
     const { title, content, tags, path } = await request.json();
-    console.log(title, content, tags);
+    console.log(title, content, tags, path);
 
     if (!title || !content || !tags) {
       return NextResponse.json(
@@ -96,6 +97,8 @@ export async function POST(request) {
       $push: { tags: { $each: tagDocuments } },
     });
 
+    // Using this I am using SSR to revalidate the path which is actually much faster then 'use client' + useEffect to fetch the data client side.
+    revalidatePath(path);
     return NextResponse.json(
       {
         message: 'Question created successfully.',

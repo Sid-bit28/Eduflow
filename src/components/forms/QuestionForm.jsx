@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { toast } from 'sonner';
 import Axios from '@/lib/Axios';
 import ROUTES from '@/constants/routes';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const Editor = dynamic(() => import('@/components/editor'), {
   ssr: false,
@@ -34,6 +34,7 @@ const QuestionForm = () => {
   const editorRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm({
     resolver: zodResolver(QuestionsSchema),
@@ -53,6 +54,7 @@ const QuestionForm = () => {
         title: values.title,
         content: values.content,
         tags: values.tags,
+        path: pathname,
       };
       console.log(payLoad);
 
