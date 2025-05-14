@@ -11,31 +11,8 @@ import Link from 'next/link';
 import React from 'react';
 
 const Page = async () => {
-  // Fetching questions from the API using Server Side Rendering (SSR)
   const response = await Axios.get('/api/question');
   const questions = response?.data?.questions || [];
-  // const [questions, setQuestions] = useState([]);
-  // const [isloading, setIsLoading] = useState(false);
-
-  // const fetchQuestions = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await Axios.get('/api/question');
-  //     console.log('response', response);
-  //     if (response.status === 200) {
-  //       const questions = response?.data?.questions;
-  //       setQuestions(questions || []);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching questions:', error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchQuestions();
-  // }, []);
 
   return (
     <>

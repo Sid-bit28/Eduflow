@@ -1,7 +1,7 @@
 import { ThemeProvider } from '@/context/ThemeProvider';
 import './globals.css';
-import Provider from '@/Provider/Provider';
 import { Toaster } from 'sonner';
+import Provider from '@/Provider/Provider';
 
 export const metadata = {
   title: 'EduFlow: A one stop solution for all developers.',
