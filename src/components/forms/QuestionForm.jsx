@@ -20,6 +20,9 @@ import { QuestionsSchema } from '@/lib/Validations';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import Axios from '@/lib/Axios';
+import ROUTES from '@/constants/routes';
+import { useRouter } from 'next/navigation';
 
 const Editor = dynamic(() => import('@/components/editor'), {
   ssr: false,
@@ -30,28 +33,43 @@ const type = 'create';
 const QuestionForm = () => {
   const editorRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
       title: '',
-      explanation: '',
+      content: '',
       tags: [],
     },
   });
 
-  function onSubmit(values) {
-    setIsLoading(true);
+  const handleFormSubmit = async values => {
     try {
+      setIsLoading(true);
       // make an async call to our API -> create a question which will contain all form data
       // navigate to home page
+      const payLoad = {
+        title: values.title,
+        content: values.content,
+        tags: values.tags,
+      };
+      console.log(payLoad);
+
+      const response = await Axios.post('/api/question', payLoad);
+      console.log(response);
+      if (response.status === 201) {
+        toast.success('Question created successfully.');
+        form.reset();
+        router.push(ROUTES.HOME);
+      }
     } catch (error) {
-      toast.error(error);
+      console.log(error);
+      toast.error(error?.response?.data?.error || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
-    console.log(values);
-  }
+  };
 
   const handleInputKeyDown = (e, field) => {
     if (e.key === 'Enter' && field.name === 'tags') {
@@ -59,7 +77,6 @@ const QuestionForm = () => {
 
       const tagInput = e.target;
       const tagValue = tagInput.value.trim();
-      console.log(tagValue);
 
       if (tagValue !== '') {
         if (tagValue.length > 15) {
@@ -88,7 +105,7 @@ const QuestionForm = () => {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleFormSubmit)}
         className="flex w-full flex-col gap-10"
       >
         {/* Title FormField */}
@@ -122,7 +139,7 @@ const QuestionForm = () => {
         {/* Editor FormField */}
         <FormField
           control={form.control}
-          name="explanation"
+          name="content"
           render={({ field }) => (
             <FormItem className={'flex w-full flex-col gap-3'}>
               <FormLabel className={'paragraph-semibold text-dark400_light800'}>
@@ -130,7 +147,6 @@ const QuestionForm = () => {
                 <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
-                {/* TODO: Add editor with Markdown properties */}
                 <Editor
                   value={field.value}
                   editorRef={editorRef}
@@ -151,18 +167,16 @@ const QuestionForm = () => {
           control={form.control}
           name="tags"
           render={({ field }) => (
-            <FormItem className={'flex w-full flex-col'}>
-              <FormLabel className={'paragraph-semibold text-dark400_light800'}>
-                Tags
-                <span className="text-primary-500">*</span>
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Tags <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
                 <div>
                   <Input
-                    className={
-                      'no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border'
-                    }
-                    placeholder="Add Tags..."
+                    disabled={type === 'Edit'}
+                    className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                    placeholder="Add tags..."
                     onKeyDown={e => handleInputKeyDown(e, field)}
                   />
 
@@ -171,36 +185,40 @@ const QuestionForm = () => {
                       {field.value.map(tag => (
                         <Badge
                           key={tag}
-                          className={
-                            'subtle-large background-light800_dark300 text-light400_dark500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize'
+                          className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
+                          onClick={() =>
+                            type !== 'Edit'
+                              ? handleTagRemove(tag, field)
+                              : () => {}
                           }
-                          onClick={() => handleTagRemove(tag, field)}
                         >
                           {tag}
-                          <Image
-                            src={'/icons/close.svg'}
-                            alt="Close Icon"
-                            width={12}
-                            height={12}
-                            className="cursor-pointer object-contain invert-0 dark:invert"
-                          />
+                          {type !== 'Edit' && (
+                            <Image
+                              src="/icons/close.svg"
+                              alt="Close icon"
+                              width={12}
+                              height={12}
+                              className="cursor-pointer object-contain invert-0 dark:invert"
+                            />
+                          )}
                         </Badge>
                       ))}
                     </div>
                   )}
                 </div>
               </FormControl>
-              <FormDescription className={'body-regular mt-2.5 text-light-500'}>
-                Add upto 3 tags to describe what your question is about. You
-                need to press Enter to add a tag.
+              <FormDescription className="body-regular mt-2.5 text-light-500">
+                Add up to 3 tags to describe what your question is about. You
+                need to press enter to add a tag.
               </FormDescription>
-              <FormMessage className={'text-red-500'} />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
         <Button
           type="submit"
-          className={'primary-gradient w-fit !text-light-900'}
+          className={'primary-gradient w-fit !text-light-900 cursor-pointer'}
           disabled={isLoading}
         >
           {isLoading ? (
