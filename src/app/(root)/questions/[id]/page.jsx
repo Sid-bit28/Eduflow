@@ -88,7 +88,7 @@ const QuestionPage = () => {
         {data?.content?.replace(/(\[.*?\])/g, '$1\n')}
       </MarkdownRenderer>
 
-      <div className='mt-8 flex flex-wrap gap-2'>
+      <div className="mt-8 flex flex-wrap gap-2">
         {data?.tags?.map(tag => (
           <DataRenderer
             key={tag._id}
