@@ -1,7 +1,9 @@
 'use client';
 
+import DataRenderer from '@/components/DataRenderer';
+import AnswerForm from '@/components/forms/AnswerForm';
 import Metric from '@/components/Metric';
-import ParseHTML from '@/components/questions/parseHTML';
+import MarkdownRenderer from '@/components/questions/MarkdownRenderer';
 import Axios from '@/lib/Axios';
 import { formatNumber, getTimeStamp } from '@/lib/utils';
 import Image from 'next/image';
@@ -16,7 +18,6 @@ const QuestionPage = () => {
 
   useEffect(() => {
     const fetchQuestion = async () => {
-      console.log('id', id);
       try {
         const response = await Axios.get(`/api/question/${id}`);
         if (response.status === 200) {
@@ -78,12 +79,27 @@ const QuestionPage = () => {
         <Metric
           imgUrl="/icons/eye.svg"
           alt="eye"
-          value={formatNumber(Number.parseInt(data?.views))}
+          value={formatNumber(Number.parseInt(data?.views || 0))}
           title=" Views"
           textStyles="small-medium text-dark400_light800"
         />
       </div>
-      <ParseHTML data={data.content} />
+      <MarkdownRenderer>
+        {data?.content?.replace(/(\[.*?\])/g, '$1\n')}
+      </MarkdownRenderer>
+
+      <div className='mt-8 flex flex-wrap gap-2'>
+        {data?.tags?.map(tag => (
+          <DataRenderer
+            key={tag._id}
+            _id={tag._id}
+            name={tag.name}
+            showCount={false}
+          />
+        ))}
+      </div>
+
+      <AnswerForm />
     </>
   );
 };
