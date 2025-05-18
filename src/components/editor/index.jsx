@@ -32,17 +32,30 @@ import { basicDark } from 'cm6-theme-basic-dark';
 import '@mdxeditor/editor/style.css';
 import './dark-editor.css';
 import { useTheme } from '@/context/ThemeProvider';
+import { useRef, forwardRef, useImperativeHandle } from 'react';
 
-const Editor = ({ value, editorRef, fieldChange }) => {
+const Editor = forwardRef(({ value, fieldChange }, ref) => {
   const { mode } = useTheme();
+  const mdxEditorRef = useRef(null);
 
   const themeExtension = mode === 'dark' ? [basicDark] : [];
+
+  useImperativeHandle(ref, () => ({
+    setContent: newContent => {
+      if (mdxEditorRef.current) {
+        mdxEditorRef.current.setMarkdown(newContent);
+      }
+    },
+    getContent: () => {
+      return mdxEditorRef.current?.getMarkdown?.();
+    },
+  }));
 
   return (
     <MDXEditor
       key={mode}
       markdown={value}
-      ref={editorRef}
+      ref={mdxEditorRef}
       onChange={fieldChange}
       className="background-light800_dark200 light-border-2 markdown-editor dark-editor grid w-full border"
       plugins={[
@@ -115,6 +128,8 @@ const Editor = ({ value, editorRef, fieldChange }) => {
       ]}
     />
   );
-};
+});
+
+Editor.displayName = 'Editor';
 
 export default Editor;

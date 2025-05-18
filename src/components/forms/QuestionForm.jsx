@@ -63,6 +63,7 @@ const QuestionForm = () => {
       if (response.status === 201) {
         toast.success('Question created successfully.');
         form.reset();
+        editorRef.current.setContent('');
         router.push(ROUTES.HOME);
       }
     } catch (error) {
@@ -151,7 +152,7 @@ const QuestionForm = () => {
               <FormControl className="mt-3.5">
                 <Editor
                   value={field.value}
-                  editorRef={editorRef}
+                  ref={editorRef}
                   fieldChange={field.onChange}
                 />
               </FormControl>

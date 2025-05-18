@@ -14,8 +14,12 @@ import Editor from '../editor';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '../ui/button';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import Axios from '@/lib/Axios';
+import { toast } from 'sonner';
 
-const AnswerForm = () => {
+const AnswerForm = ({ question, questionId }) => {
+  const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const editorRef = useRef(null);
   const form = useForm({
@@ -25,8 +29,26 @@ const AnswerForm = () => {
     },
   });
 
-  const handleCreateAnswer = () => {
-    
+  const handleCreateAnswer = async values => {
+    console.log('Values', values);
+    setIsSubmitting(true);
+    try {
+      const payLoad = {
+        content: values.answer,
+        question: questionId,
+        path: pathname,
+      };
+      const response = await Axios.post('/api/answer', payLoad);
+      console.log('Response', response);
+      if (response.status === 201) {
+        toast.success('Answer created successfully.');
+        form.reset();
+        editorRef.current.setContent('');
+      }
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -64,7 +86,7 @@ const AnswerForm = () => {
                 <FormControl className="mt-3.5">
                   <Editor
                     value={field.value}
-                    editorRef={editorRef}
+                    ref={editorRef}
                     fieldChange={field.onChange}
                   />
                 </FormControl>
@@ -75,8 +97,8 @@ const AnswerForm = () => {
 
           <div className="flex justify-end">
             <Button
-              type="button"
-              className={'primary-gradient w-fit text-white'}
+              type="submit"
+              className={'primary-gradient w-fit text-white cursor-pointer'}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}

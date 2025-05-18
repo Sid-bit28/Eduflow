@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
-    console.log('ID', id);
     if (!id) {
       return NextResponse.json(
         {

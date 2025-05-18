@@ -8,8 +8,15 @@ import Link from 'next/link';
 import React from 'react';
 
 const Page = async () => {
-  const response = await Axios.get('/api/user');
-  const users = response?.data?.users || [];
+  let usersData = null;
+  try {
+    const response = await Axios.get('/api/user');
+    if (response?.status === 200) {
+      usersData = response?.data?.users || [];
+    }
+  } catch (error) {
+    throw new Error('Failed to fetch community.');
+  }
 
   return (
     <div>
@@ -29,8 +36,8 @@ const Page = async () => {
         />
       </section>
       <section className="mt-12 flex flex-wrap gap-4">
-        {users.length > 0 ? (
-          users.map(user => <UserCard key={user._id} user={user} />)
+        {usersData.length > 0 ? (
+          usersData.map(user => <UserCard key={user._id} user={user} />)
         ) : (
           <div className="paragraph-regular text-dark200_light800 mx-auto max-w-4xl text-center">
             <p>No Users Yet.</p>

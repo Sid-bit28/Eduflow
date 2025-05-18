@@ -8,9 +8,15 @@ import TagCard from '@/components/cards/TagCard';
 import NoResult from '@/components/NoResult';
 
 const Page = async () => {
-  const response = await Axios.get('/api/tags');
-  const tags = response?.data?.tags || [];
-  console.log(tags);
+  let tagsData = null;
+  try {
+    const response = await Axios.get('/api/tags');
+    if (response?.status === 200) {
+      tagsData = response?.data?.tags || [];
+    }
+  } catch (error) {
+    throw new Error('Failed to fetch tags.');
+  }
 
   return (
     <div>
@@ -27,8 +33,8 @@ const Page = async () => {
         <CommonFilter filters={TagFilters} otherClasses="min-h-[56px] w-full" />
       </section>
       <section className="mt-12 flex flex-wrap gap-4">
-        {tags.length > 0 ? (
-          tags.map(tag => <TagCard key={tag._id} tag={tag} />)
+        {tagsData.length > 0 ? (
+          tagsData.map(tag => <TagCard key={tag._id} tag={tag} />)
         ) : (
           <NoResult
             title="No Tags Found"

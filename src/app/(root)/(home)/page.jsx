@@ -11,8 +11,15 @@ import Link from 'next/link';
 import React from 'react';
 
 const Page = async () => {
-  const response = await Axios.get('/api/question');
-  const questions = response?.data?.questions || [];
+  let questionsData = null;
+  try {
+    const response = await Axios.get('/api/question');
+    if (response?.status === 200) {
+      questionsData = response?.data?.questions || [];
+    }
+  } catch (error) {
+    throw new Error('Failed to fetch questions.');
+  }
 
   return (
     <>
@@ -50,8 +57,8 @@ const Page = async () => {
       <HomeFilter filters={HomePageFilters} />
 
       <section className="mt-10 flex w-full flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map(question => (
+        {questionsData.length > 0 ? (
+          questionsData.map(question => (
             <QuestionCard
               key={question._id}
               _id={question._id}
