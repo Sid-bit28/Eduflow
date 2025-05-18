@@ -6,7 +6,6 @@ import Axios from '@/lib/Axios';
 import React from 'react';
 import TagCard from '@/components/cards/TagCard';
 import NoResult from '@/components/NoResult';
-import Link from 'next/link';
 
 const Page = async () => {
   const response = await Axios.get('/api/tags');
