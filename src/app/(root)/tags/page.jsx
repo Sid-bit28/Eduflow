@@ -2,17 +2,17 @@ import CommonFilter from '@/components/filters/CommonFilter';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { TagFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
-import Axios from '@/lib/Axios';
 import React from 'react';
 import TagCard from '@/components/cards/TagCard';
 import NoResult from '@/components/NoResult';
+import { getAllTags } from '@/app/actions/tag.action';
 
 const Page = async () => {
-  let tagsData = null;
+  let tagsData = [];
   try {
-    const response = await Axios.get('/api/tags');
-    if (response?.status === 200) {
-      tagsData = response?.data?.tags || [];
+    const response = await getAllTags({});
+    if (response?.success) {
+      tagsData = response?.tags || [];
     }
   } catch (error) {
     throw new Error('Failed to fetch tags.');

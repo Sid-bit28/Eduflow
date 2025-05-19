@@ -6,13 +6,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getTimeStamp } from '@/lib/utils';
 import MarkdownRenderer from '../questions/MarkdownRenderer';
+import { getAnswers } from '@/app/actions/answer.action';
 
 const AllAnswers = async ({ questionId, totalAnswers }) => {
-  let answersData = null;
+  let answersData = [];
   try {
-    const response = await Axios.get(`/api/answer/${questionId}`);
-    if (response?.status === 200) {
-      answersData = response?.data?.answers;
+    const response = await getAnswers({ questionId: JSON.parse(questionId) });
+    console.log(response);
+    if (response?.success) {
+      answersData = response?.answers || [];
     }
   } catch (error) {
     throw new Error('Failed to fetch answers');

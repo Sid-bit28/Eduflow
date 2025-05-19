@@ -1,21 +1,21 @@
+import { getAllUsers } from '@/app/actions/user.action';
 import UserCard from '@/components/cards/UserCard';
 import CommonFilter from '@/components/filters/CommonFilter';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { UserFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
-import Axios from '@/lib/Axios';
 import Link from 'next/link';
 import React from 'react';
 
 const Page = async () => {
-  let usersData = null;
+  let usersData = [];
   try {
-    const response = await Axios.get('/api/user');
-    if (response?.status === 200) {
-      usersData = response?.data?.users || [];
+    const response = await getAllUsers({});
+    if (response?.success) {
+      usersData = response?.users || [];
     }
   } catch (error) {
-    throw new Error('Failed to fetch community.');
+    console.log(error?.error || 'Failed to fetch users.');
   }
 
   return (

@@ -15,8 +15,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '../ui/button';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import Axios from '@/lib/Axios';
 import { toast } from 'sonner';
+import { createAnswer } from '@/app/actions/answer.action';
 
 const AnswerForm = ({ question, questionId }) => {
   const pathname = usePathname();
@@ -30,22 +30,23 @@ const AnswerForm = ({ question, questionId }) => {
   });
 
   const handleCreateAnswer = async values => {
-    console.log('Values', values);
     setIsSubmitting(true);
     try {
       const payLoad = {
         content: values.answer,
-        question: questionId,
+        question: JSON.parse(questionId),
         path: pathname,
       };
-      const response = await Axios.post('/api/answer', payLoad);
+      const response = await createAnswer(payLoad);
       console.log('Response', response);
-      if (response.status === 201) {
-        toast.success('Answer created successfully.');
+      if (response?.success) {
+        toast.success(response?.message);
         form.reset();
         editorRef.current.setContent('');
       }
     } catch (error) {
+      console.log(error);
+      toast.error(error?.error || 'Failed to Create Answer.');
     } finally {
       setIsSubmitting(false);
     }
@@ -53,7 +54,7 @@ const AnswerForm = ({ question, questionId }) => {
 
   return (
     <div>
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-5">
         <h4 className="paragraph-semibold text-dark400_light800">
           Write your answer here..
         </h4>

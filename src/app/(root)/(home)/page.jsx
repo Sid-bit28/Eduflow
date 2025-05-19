@@ -1,3 +1,4 @@
+import { getQuestions } from '@/app/actions/question.action';
 import QuestionCard from '@/components/cards/QuestionCard';
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
@@ -6,19 +7,18 @@ import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
-import Axios from '@/lib/Axios';
 import Link from 'next/link';
 import React from 'react';
 
 const Page = async () => {
-  let questionsData = null;
+  let questionsData = [];
   try {
-    const response = await Axios.get('/api/question');
-    if (response?.status === 200) {
-      questionsData = response?.data?.questions || [];
+    const response = await getQuestions({});
+    if (response?.success) {
+      questionsData = response?.questions || [];
     }
   } catch (error) {
-    throw new Error('Failed to fetch questions.');
+    console.log(error);
   }
 
   return (

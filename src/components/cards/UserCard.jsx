@@ -5,10 +5,18 @@ import Link from 'next/link';
 import React from 'react';
 import { Badge } from '../ui/badge';
 import DataRenderer from '../DataRenderer';
+import { getTopInteractedTags } from '@/app/actions/tag.action';
 
 const UserCard = async ({ user }) => {
-  const response = await Axios.get(`/api/tag/${user._id}`);
-  console.log(response.data);
+  let topInteractedTagsData = [];
+  try {
+    const response = await getTopInteractedTags({ userId: user._id });
+    if (response?.success) {
+      topInteractedTagsData = response?.tags;
+    }
+  } catch (error) {
+    console.log(error?.error || 'Failed to fetch top interacted tags.');
+  }
   return (
     <div className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px]">
       <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
@@ -32,9 +40,9 @@ const UserCard = async ({ user }) => {
         </div>
 
         <div className="mt-5">
-          {response.data.length > 0 ? (
+          {topInteractedTagsData.length > 0 ? (
             <div className="flex items-center gap-2">
-              {response.data.map(tag => (
+              {topInteractedTagsData.map(tag => (
                 <DataRenderer key={tag._id} _id={tag._id} name={tag.name} />
               ))}
             </div>

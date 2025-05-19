@@ -20,9 +20,9 @@ import { QuestionsSchema } from '@/lib/Validations';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
 import { toast } from 'sonner';
-import Axios from '@/lib/Axios';
 import ROUTES from '@/constants/routes';
 import { usePathname, useRouter } from 'next/navigation';
+import { createQuestion } from '@/app/actions/question.action';
 
 const Editor = dynamic(() => import('@/components/editor'), {
   ssr: false,
@@ -46,10 +46,8 @@ const QuestionForm = () => {
   });
 
   const handleFormSubmit = async values => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      // make an async call to our API -> create a question which will contain all form data
-      // navigate to home page
       const payLoad = {
         title: values.title,
         content: values.content,
@@ -57,18 +55,16 @@ const QuestionForm = () => {
         path: pathname,
       };
       console.log(payLoad);
-
-      const response = await Axios.post('/api/question', payLoad);
-      console.log(response);
-      if (response.status === 201) {
-        toast.success('Question created successfully.');
+      const response = await createQuestion(payLoad);
+      if (response?.success) {
+        toast.success(response?.message);
         form.reset();
         editorRef.current.setContent('');
         router.push(ROUTES.HOME);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error?.response?.data?.error || 'Something went wrong');
+      toast.error(error?.error || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }

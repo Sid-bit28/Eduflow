@@ -1,11 +1,19 @@
 'use client';
 
+import {
+  downvoteQuestion,
+  upvoteQuestion,
+} from '@/app/actions/question.action';
+import Axios from '@/lib/Axios';
 import { formatNumber } from '@/lib/utils';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
+import { toast } from 'sonner';
 
 const Votes = ({
-  types,
+  type,
   itemId,
   userId,
   upvotes,
@@ -14,9 +22,68 @@ const Votes = ({
   hasDownvoted,
   hasSaved,
 }) => {
+  const session = useSession();
+  const pathname = usePathname();
+  const router = useRouter();
+
   const handleSave = () => {};
 
-  const handlevote = action => {};
+  const handleVote = async action => {
+    if (!session) {
+      return;
+    }
+
+    if (action === 'upvote') {
+      if (type === 'Question') {
+        const payLoad = {
+          questionId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpvoted,
+          hasDownvoted,
+          path: pathname,
+        };
+        const response = await upvoteQuestion(payLoad);
+        if (response?.success) {
+          toast.success('Question upvoted.');
+          router.refresh();
+        }
+      } else if (type === 'Answer') {
+        // const payLoad = {
+        //   questionId: JSON.parse(itemId),
+        //   hasUpvoted,
+        //   hasDownvoted,
+        //   path: pathname,
+        // };
+        // const response = await Axios.post('/api/upvote', payLoad);
+      }
+    }
+
+    if (action === 'downvote') {
+      if (type === 'Question') {
+        const payLoad = {
+          questionId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpvoted,
+          hasDownvoted,
+          path: pathname,
+        };
+        const response = await downvoteQuestion(payLoad);
+        if (response?.success) {
+          toast.success('Question downvoted.');
+          router.refresh();
+        }
+      } else if (type === 'Answer') {
+        // const payLoad = {
+        //   questionId: JSON.parse(itemId),
+        //   hasUpvoted,
+        //   hasDownvoted,
+        //   path: pathname,
+        // };
+        // const response = await Axios.post('/api/upvote', payLoad);
+      }
+    }
+  };
+
   return (
     <div className="flex gap-5">
       <div className="flex-center gap-2.5">
@@ -43,9 +110,7 @@ const Votes = ({
             height={18}
             alt="downvote"
             className="cursor-pointer"
-            onClick={() => {
-              handlevote('downvote');
-            }}
+            onClick={() => handleVote('downvote')}
           />
           <div className="flex-center background-light700_dark400 min-[48px] rounded-sm p-1">
             <p className="subtle-medium text-dark400_light900">

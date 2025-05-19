@@ -1,3 +1,5 @@
+import { getQuestionById } from '@/app/actions/question.action';
+import { getUserById } from '@/app/actions/user.action';
 import AllAnswers from '@/components/answer/AllAnswers';
 import DataRenderer from '@/components/DataRenderer';
 import AnswerForm from '@/components/forms/AnswerForm';
@@ -13,16 +15,27 @@ import React from 'react';
 const QuestionPage = async ({ params }) => {
   const { id } = await params;
   let questionData = null;
+  let user = null;
 
   try {
-    const response = await Axios.get(`/api/question/${id}`);
-    if (response.status === 200) {
-      questionData = response?.data?.question;
+    const response = await getQuestionById({ questionId: id });
+    if (response?.success) {
+      questionData = response?.question;
     }
   } catch (error) {
-    throw new Error('Question not found');
+    throw new Error(error?.error || 'Internal Server Error');
   }
-  console.log(questionData);
+
+  try {
+    const response = await getUserById({});
+    if (response?.success) {
+      user = response?.user;
+    }
+  } catch (error) {
+    throw new Error(error?.error || 'Internal Server Error');
+  }
+
+  console.log(user);
 
   return (
     <>
@@ -45,18 +58,14 @@ const QuestionPage = async ({ params }) => {
           </Link>
           <div className="flex justify-end">
             <Votes
-              type="question"
+              type="Question"
               itemId={JSON.stringify(questionData?._id)}
-              userId={JSON.stringify(questionData?.author?._id)}
+              userId={JSON.stringify(user?._id)}
               upvotes={questionData?.upvotes?.length}
-              hasUpvoted={questionData?.upvotes?.includes(
-                questionData?.author?._id
-              )}
+              hasUpvoted={questionData?.upvotes?.includes(user?._id)}
               downvotes={questionData?.downvotes?.length}
-              hasDownvoted={questionData?.downvotes?.includes(
-                questionData?.author?._id
-              )}
-              hasSaved={questionData?.saved?.includes(questionData?._id)}
+              hasDownvoted={questionData?.downvotes?.includes(user?._id)}
+              hasSaved={user?.saved?.includes(questionData?._id)}
             />
           </div>
         </div>
@@ -104,13 +113,13 @@ const QuestionPage = async ({ params }) => {
       </div>
 
       <AllAnswers
-        questionId={id}
+        questionId={JSON.stringify(id)}
         totalAnswers={questionData?.answers?.length}
       />
 
       <AnswerForm
         question={questionData?.content}
-        questionId={questionData?._id}
+        questionId={JSON.stringify(questionData?._id)}
       />
     </>
   );
