@@ -2,6 +2,7 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
@@ -117,4 +118,57 @@ const toggleSaveQuestion = async params => {
   }
 };
 
-export { getAllUsers, getUserById, toggleSaveQuestion };
+const getSavedQuestions = async params => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return {
+        success: false,
+        error: 'Unauthorized User.',
+      };
+    }
+
+    const userId = session?.user?.id;
+
+    const { page = 1, pageSize = 10, filter, searchQuery } = params;
+
+    const query = searchQuery
+      ? { title: { $regex: new RegExp(searchQuery, 'i') } }
+      : {};
+
+    const user = await UserModel.findById(userId).populate({
+      path: 'saved',
+      match: query,
+      options: {
+        sort: { createdAt: -1 },
+      },
+      populate: [
+        { path: 'tags', model: TagModel, select: '_id name' },
+        { path: 'author', model: UserModel, select: '_id name picture' },
+      ],
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found.',
+      };
+    }
+
+    const savedQuestions = user.saved;
+
+    return {
+      success: true,
+      message: 'Fetched Saved Questions Successfully.',
+      savedQuestions: JSON.parse(JSON.stringify(savedQuestions)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Fetching Saved Questions failed.',
+    };
+  }
+};
+
+export { getAllUsers, getUserById, toggleSaveQuestion, getSavedQuestions };
