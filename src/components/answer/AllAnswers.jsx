@@ -7,8 +7,9 @@ import Image from 'next/image';
 import { getTimeStamp } from '@/lib/utils';
 import MarkdownRenderer from '../questions/MarkdownRenderer';
 import { getAnswers } from '@/app/actions/answer.action';
+import Votes from '../votes/Votes';
 
-const AllAnswers = async ({ questionId, totalAnswers }) => {
+const AllAnswers = async ({ questionId, userId, totalAnswers }) => {
   let answersData = [];
   try {
     const response = await getAnswers({ questionId: JSON.parse(questionId) });
@@ -19,6 +20,7 @@ const AllAnswers = async ({ questionId, totalAnswers }) => {
   } catch (error) {
     throw new Error('Failed to fetch answers');
   }
+  console.log(userId);
 
   return (
     <div className="mt-11">
@@ -49,11 +51,23 @@ const AllAnswers = async ({ questionId, totalAnswers }) => {
                     </p>
                     <p className="small-regular text-light400_dark500 line-clamp-1">
                       {' '}
-                      answered {getTimeStamp(answer?.createdAt)}
+                      {getTimeStamp(answer?.createdAt)}
                     </p>
                   </div>
                 </Link>
-                <div className="flex justify-end">VOTING</div>
+                <div className="flex justify-end">
+                  <Votes
+                    type="Answer"
+                    itemId={JSON.stringify(answer?._id)}
+                    userId={userId}
+                    upvotes={answer?.upvotes?.length}
+                    hasUpvoted={answer?.upvotes?.includes(JSON.parse(userId))}
+                    downvotes={answer?.downvotes?.length}
+                    hasDownvoted={answer?.downvotes?.includes(
+                      JSON.parse(userId)
+                    )}
+                  />
+                </div>
               </div>
             </div>
 

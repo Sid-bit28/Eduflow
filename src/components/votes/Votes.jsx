@@ -1,5 +1,6 @@
 'use client';
 
+import { downvoteAnswer, upvoteAnswer } from '@/app/actions/answer.action';
 import {
   downvoteQuestion,
   upvoteQuestion,
@@ -48,13 +49,18 @@ const Votes = ({
           router.refresh();
         }
       } else if (type === 'Answer') {
-        // const payLoad = {
-        //   questionId: JSON.parse(itemId),
-        //   hasUpvoted,
-        //   hasDownvoted,
-        //   path: pathname,
-        // };
-        // const response = await Axios.post('/api/upvote', payLoad);
+        const payLoad = {
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpvoted,
+          hasDownvoted,
+          path: pathname,
+        };
+        const response = await upvoteAnswer(payLoad);
+        if (response?.success) {
+          toast.success('Answer upvoted.');
+          router.refresh();
+        }
       }
     }
 
@@ -73,13 +79,18 @@ const Votes = ({
           router.refresh();
         }
       } else if (type === 'Answer') {
-        // const payLoad = {
-        //   questionId: JSON.parse(itemId),
-        //   hasUpvoted,
-        //   hasDownvoted,
-        //   path: pathname,
-        // };
-        // const response = await Axios.post('/api/upvote', payLoad);
+        const payLoad = {
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpvoted,
+          hasDownvoted,
+          path: pathname,
+        };
+        const response = await downvoteAnswer(payLoad);
+        if (response?.success) {
+          toast.success('Answer downvoted.');
+          router.refresh();
+        }
       }
     }
   };
@@ -119,14 +130,17 @@ const Votes = ({
           </div>
         </div>
       </div>
-      <Image
-        src={hasSaved ? '/icons/star-filled.svg' : '/icons/star-red.svg'}
-        width={18}
-        height={18}
-        alt="star"
-        className="cursor-pointer"
-        onClick={handleSave}
-      />
+
+      {type === 'Question' && (
+        <Image
+          src={hasSaved ? '/icons/star-filled.svg' : '/icons/star-red.svg'}
+          width={18}
+          height={18}
+          alt="star"
+          className="cursor-pointer"
+          onClick={handleSave}
+        />
+      )}
     </div>
   );
 };

@@ -35,8 +35,6 @@ const QuestionPage = async ({ params }) => {
     throw new Error(error?.error || 'Internal Server Error');
   }
 
-  console.log(user);
-
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -114,6 +112,7 @@ const QuestionPage = async ({ params }) => {
 
       <AllAnswers
         questionId={JSON.stringify(id)}
+        userId={JSON.stringify(user?._id)}
         totalAnswers={questionData?.answers?.length}
       />
 

@@ -90,4 +90,93 @@ const getAnswers = async params => {
   }
 };
 
-export { createAnswer, getAnswers };
+const upvoteAnswer = async params => {
+  try {
+    await connectDB();
+
+    const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasUpvoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else if (hasDownvoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { upvotes: userId } };
+    }
+
+    const answer = await AnswerModel.findByIdAndUpdate(answerId, updateQuery, {
+      new: true,
+    });
+
+    if (!answer) {
+      return {
+        success: false,
+        error: 'Answer not found.',
+      };
+    }
+
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Answer Upvoted Successfully.',
+    };
+
+    // Increment author's reputation
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Error upvoting answer.',
+    };
+  }
+};
+
+const downvoteAnswer = async params => {
+  try {
+    await connectDB();
+
+    const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasDownvoted) {
+      updateQuery = { $pull: { downvote: userId } };
+    } else if (hasUpvoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { downvotes: userId } };
+    }
+
+    const answer = await AnswerModel.findByIdAndUpdate(answerId, updateQuery, {
+      new: true,
+    });
+
+    if (!answer) {
+      return {
+        success: false,
+        error: 'Answer not found.',
+      };
+    }
+
+    // Increment author's reputation
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Answer Downvoted Successfully.',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Error downvoting answer.',
+    };
+  }
+};
+
+export { createAnswer, getAnswers, upvoteAnswer, downvoteAnswer };
