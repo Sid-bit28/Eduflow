@@ -5,6 +5,7 @@ import {
   downvoteQuestion,
   upvoteQuestion,
 } from '@/app/actions/question.action';
+import { toggleSaveQuestion } from '@/app/actions/user.action';
 import Axios from '@/lib/Axios';
 import { formatNumber } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
@@ -27,7 +28,23 @@ const Votes = ({
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleSave = () => {};
+  const handleSave = async () => {
+    try {
+      const payLoad = {
+        userId: JSON.parse(userId),
+        questionId: JSON.parse(itemId),
+        path: pathname,
+      };
+      const response = await toggleSaveQuestion(payLoad);
+      if (response?.success) {
+        toast.success(response?.message);
+        router.refresh();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.error || 'Internal Server Error');
+    }
+  };
 
   const handleVote = async action => {
     if (!session) {
@@ -45,7 +62,7 @@ const Votes = ({
         };
         const response = await upvoteQuestion(payLoad);
         if (response?.success) {
-          toast.success('Question upvoted.');
+          toast.success(response?.message);
           router.refresh();
         }
       } else if (type === 'Answer') {
@@ -58,7 +75,7 @@ const Votes = ({
         };
         const response = await upvoteAnswer(payLoad);
         if (response?.success) {
-          toast.success('Answer upvoted.');
+          toast.success(response?.message);
           router.refresh();
         }
       }
@@ -75,7 +92,7 @@ const Votes = ({
         };
         const response = await downvoteQuestion(payLoad);
         if (response?.success) {
-          toast.success('Question downvoted.');
+          toast.success(response?.message);
           router.refresh();
         }
       } else if (type === 'Answer') {
@@ -88,7 +105,7 @@ const Votes = ({
         };
         const response = await downvoteAnswer(payLoad);
         if (response?.success) {
-          toast.success('Answer downvoted.');
+          toast.success(response?.message);
           router.refresh();
         }
       }
