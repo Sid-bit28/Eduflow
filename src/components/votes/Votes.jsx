@@ -1,6 +1,7 @@
 'use client';
 
 import { downvoteAnswer, upvoteAnswer } from '@/app/actions/answer.action';
+import { viewQuestion } from '@/app/actions/interaction.action';
 import {
   downvoteQuestion,
   upvoteQuestion,
@@ -11,7 +12,7 @@ import { formatNumber } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { toast } from 'sonner';
 
 const Votes = ({
@@ -111,6 +112,13 @@ const Votes = ({
       }
     }
   };
+
+  useEffect(() => {
+    viewQuestion({
+      questionId: JSON.parse(itemId),
+      userId: userId ? JSON.parse(userId) : undefined,
+    });
+  }, [itemId, userId, pathname, router]);
 
   return (
     <div className="flex gap-5">
