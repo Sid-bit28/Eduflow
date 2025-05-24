@@ -2,6 +2,8 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import AnswerModel from '@/models/Answer.Model';
+import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
 import { getServerSession } from 'next-auth';
@@ -171,4 +173,102 @@ const getSavedQuestions = async params => {
   }
 };
 
-export { getAllUsers, getUserById, toggleSaveQuestion, getSavedQuestions };
+const getUserInfo = async params => {
+  try {
+    await connectDB();
+
+    const { userId } = params;
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found.',
+      };
+    }
+
+    const totalQuestions = await QuestionModel.countDocuments({
+      author: user._id,
+    });
+
+    const totalAnswers = await AnswerModel.countDocuments({ author: user._id });
+
+    return {
+      success: true,
+      user: JSON.parse(JSON.stringify(user)),
+      totalQuestions,
+      totalAnswers,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch user.',
+    };
+  }
+};
+
+const getLoggedInUserInfo = async params => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return {
+        success: false,
+        error: 'Session not found.',
+      };
+    }
+
+    return {
+      success: true,
+      userId: session?.user?.id,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'User not logged In.',
+    };
+  }
+};
+
+const getUserQuestions = async params => {
+  try {
+    await connectDB();
+
+    const { userId, page = 1, pageSize = 10 } = params;
+
+    const totalQuestions = await QuestionModel.countDocuments({
+      author: userId,
+    });
+
+    const userQuestions = await QuestionModel.find({ author: userId })
+      .sort({
+        views: -1,
+        upvotes: -1,
+      })
+      .populate('tags', '_id name')
+      .populate('author', '_id name picture');
+
+    return {
+      success: true,
+      totalQuestions: JSON.parse(JSON.stringify(totalQuestions)),
+      questions: JSON.parse(JSON.stringify(userQuestions)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch questions.',
+    };
+  }
+};
+
+export {
+  getAllUsers,
+  getUserById,
+  toggleSaveQuestion,
+  getSavedQuestions,
+  getUserInfo,
+  getLoggedInUserInfo,
+  getUserQuestions,
+};

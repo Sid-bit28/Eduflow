@@ -41,3 +41,13 @@ export function formatNumber(number) {
     return number.toString();
   }
 }
+
+export function getJoinedDate(isoDate) {
+  if (!isoDate) return '';
+
+  const date = new Date(isoDate);
+  return date.toLocaleString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+}
