@@ -2,6 +2,8 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import AnswerModel from '@/models/Answer.Model';
+import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
@@ -226,10 +228,40 @@ const downvoteQuestion = async params => {
   }
 };
 
+const deleteQuestion = async params => {
+  try {
+    await connectDB();
+
+    const { questionId, path } = params;
+    console.log(questionId, path);
+
+    await QuestionModel.deleteOne({ _id: questionId });
+    await AnswerModel.deleteMany({ question: questionId });
+    await InteractionModel.deleteMany({ question: questionId });
+    await TagModel.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Question successfully deleted.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to delete question.',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
   getQuestionById,
   upvoteQuestion,
   downvoteQuestion,
+  deleteQuestion,
 };

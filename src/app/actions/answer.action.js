@@ -3,6 +3,7 @@
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
 import AnswerModel from '@/models/Answer.Model';
+import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
@@ -179,4 +180,36 @@ const downvoteAnswer = async params => {
   }
 };
 
-export { createAnswer, getAnswers, upvoteAnswer, downvoteAnswer };
+const deleteAnswer = async params => {
+  try {
+    await connectDB();
+
+    const { answerId, path } = params;
+
+    const answer = await AnswerModel.findById(answerId);
+    if (!answer) {
+      return {
+        status: false,
+        error: 'Answer not found.',
+      };
+    }
+
+    await AnswerModel.deleteOne({ _id: answerId });
+    await QuestionModel.updateMany(
+      { _id: answer.question },
+      { $pull: { answer: answerId } }
+    );
+    await InteractionModel.deleteMany({ answer: answerId });
+
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Answer deleted successfully.',
+    };
+  } catch (error) {
+    console.log(error);
+    throw new Error('Unable to delete answer.');
+  }
+};
+
+export { createAnswer, getAnswers, upvoteAnswer, downvoteAnswer, deleteAnswer };

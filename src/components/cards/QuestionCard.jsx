@@ -4,8 +4,10 @@ import React from 'react';
 import DataRenderer from '../DataRenderer';
 import Metric from '../Metric';
 import { formatNumber, getTimeStamp } from '@/lib/utils';
+import { getLoggedInUserInfo, getUserInfo } from '@/app/actions/user.action';
+import EditDeleteAction from '../EditDeleteAction';
 
-const QuestionCard = ({
+const QuestionCard = async ({
   _id,
   title,
   tags,
@@ -15,6 +17,18 @@ const QuestionCard = ({
   answers,
   createdAt,
 }) => {
+  let userId = null;
+  try {
+    const response = await getLoggedInUserInfo();
+    if (response.success) {
+      userId = response.userId;
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error(error?.error || 'Internal Server Error');
+  }
+
+  let showActionButtons = userId && userId === author._id;
   return (
     <div className="card-wrapper p-9 sm:px-11 rounded-[10px]">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
@@ -28,8 +42,10 @@ const QuestionCard = ({
             </h3>
           </Link>
         </div>
-        {/* TODO: If user is signed in and the question belongs to that user, edit
-        or delete option should be visible. */}
+
+        {showActionButtons && (
+          <EditDeleteAction type="Question" itemId={JSON.stringify(_id)} />
+        )}
       </div>
 
       <div className="mt-3.5 flex flex-wrap gap-2">

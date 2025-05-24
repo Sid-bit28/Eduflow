@@ -2,8 +2,22 @@ import { formatNumber, getTimeStamp } from '@/lib/utils';
 import Link from 'next/link';
 import React from 'react';
 import Metric from '../Metric';
+import { getLoggedInUserInfo } from '@/app/actions/user.action';
+import EditDeleteAction from '../EditDeleteAction';
 
-const AnswerCard = ({ _id, question, author, upvotes, createdAt }) => {
+const AnswerCard = async ({ _id, question, author, upvotes, createdAt }) => {
+  let userId = null;
+  try {
+    const response = await getLoggedInUserInfo();
+    if (response.success) {
+      userId = response.userId;
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error(error?.error || 'Internal Server Error');
+  }
+
+  let showActionButtons = userId && userId === author._id;
   return (
     <div>
       <div className="card-wrapper rounded-[10px] px-11 py-9">
@@ -18,6 +32,9 @@ const AnswerCard = ({ _id, question, author, upvotes, createdAt }) => {
               </Link>
             </h3>
           </div>
+          {showActionButtons && (
+            <EditDeleteAction type="Answer" itemId={JSON.stringify(_id)} />
+          )}
         </div>
 
         <div className="flex-between mt-6 w-full flex-wrap gap-3">
