@@ -263,6 +263,37 @@ const getUserQuestions = async params => {
   }
 };
 
+const getUserAnswers = async params => {
+  try {
+    await connectDB();
+
+    const { userId, page = 1, pageSize = 10 } = params;
+
+    const totalAnswers = await AnswerModel.countDocuments({
+      author: userId,
+    });
+
+    const userAnswers = await AnswerModel.find({ author: userId })
+      .sort({
+        upvotes: -1,
+      })
+      .populate('question', '_id title')
+      .populate('author', '_id name picture');
+
+    return {
+      success: true,
+      totalAnswers: JSON.parse(JSON.stringify(totalAnswers)),
+      answers: JSON.parse(JSON.stringify(userAnswers)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch questions.',
+    };
+  }
+};
+
 export {
   getAllUsers,
   getUserById,
@@ -271,4 +302,5 @@ export {
   getUserInfo,
   getLoggedInUserInfo,
   getUserQuestions,
+  getUserAnswers,
 };

@@ -121,8 +121,11 @@ const Page = async ({ params, searchParams }) => {
             <TabsContent value="top-posts">
               <QuestionTab searchParams={searchParams} userId={user._id} />
             </TabsContent>
-            <TabsContent value="answers">
-              <AnswerTab />
+            <TabsContent
+              value="answers"
+              className={'flex w-full flex-col gap-6'}
+            >
+              <AnswerTab searchParams={searchParams} userId={user._id} />
             </TabsContent>
           </Tabs>
         </Tabs>
