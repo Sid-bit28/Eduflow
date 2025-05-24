@@ -4,18 +4,26 @@ import { connectDB } from '@/config/connectDB';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
-import { model } from 'mongoose';
 
 const getTopInteractedTags = async params => {
   try {
     await connectDB();
 
     const { userId } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
 
     const user = await UserModel.findById(userId);
 
     if (!user) {
-      throw new Error('User not found');
+      return {
+        success: false,
+        error: 'user not found.',
+      };
     }
 
     const tags = [
@@ -61,6 +69,12 @@ const getQuestionByTagId = async params => {
     await connectDB();
 
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+    if (!tagId) {
+      return {
+        success: false,
+        error: 'tagId is required.',
+      };
+    }
 
     const tagFilter = { _id: tagId };
 

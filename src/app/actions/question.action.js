@@ -50,6 +50,12 @@ const createQuestion = async params => {
     const author = session?.user?.id;
 
     const { title, content, tags, path } = params;
+    if (!title || !content || !tags) {
+      return {
+        success: false,
+        error: 'title, content & tags are required.',
+      };
+    }
 
     const question = await QuestionModel.create({
       title,
@@ -75,7 +81,6 @@ const createQuestion = async params => {
       $push: { tags: { $each: tagDocuments } },
     });
 
-    // Using this I am using SSR to revalidate the path which is actually much faster then 'use client' + useEffect to fetch the data client side.
     revalidatePath(path);
     return {
       success: true,
@@ -140,6 +145,12 @@ const upvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -187,6 +198,12 @@ const downvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -233,7 +250,12 @@ const deleteQuestion = async params => {
     await connectDB();
 
     const { questionId, path } = params;
-    console.log(questionId, path);
+    if (!questionId) {
+      return {
+        success: false,
+        error: 'questionId is required.',
+      };
+    }
 
     await QuestionModel.deleteOne({ _id: questionId });
     await AnswerModel.deleteMany({ question: questionId });

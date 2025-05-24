@@ -76,12 +76,18 @@ const toggleSaveQuestion = async params => {
     await connectDB();
 
     const { userId, questionId, path } = params;
+    if (!userId || !questionId) {
+      return {
+        success: false,
+        error: 'userId & questionId is required.',
+      };
+    }
 
     const user = await UserModel.findById(userId);
 
     if (!userId) {
       return {
-        status: false,
+        success: false,
         error: 'User not found.',
       };
     }
@@ -114,7 +120,7 @@ const toggleSaveQuestion = async params => {
   } catch (error) {
     console.log(error);
     return {
-      status: false,
+      success: false,
       error: 'Toggle Save Question failed.',
     };
   }
@@ -178,8 +184,14 @@ const getUserInfo = async params => {
     await connectDB();
 
     const { userId } = params;
-    const user = await UserModel.findById(userId);
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
 
+    const user = await UserModel.findById(userId);
     if (!user) {
       return {
         success: false,
@@ -213,8 +225,8 @@ const getLoggedInUserInfo = async params => {
     const session = await getServerSession(authOptions);
     if (!session) {
       return {
-        success: false,
-        error: 'Session not found.',
+        success: true,
+        message: 'Session not found.',
       };
     }
 
@@ -236,6 +248,12 @@ const getUserQuestions = async params => {
     await connectDB();
 
     const { userId, page = 1, pageSize = 10 } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
 
     const totalQuestions = await QuestionModel.countDocuments({
       author: userId,
@@ -268,6 +286,12 @@ const getUserAnswers = async params => {
     await connectDB();
 
     const { userId, page = 1, pageSize = 10 } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
 
     const totalAnswers = await AnswerModel.countDocuments({
       author: userId,

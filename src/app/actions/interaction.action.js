@@ -9,6 +9,12 @@ const viewQuestion = async params => {
     await connectDB();
 
     const { questionId, userId } = params;
+    if (!questionId || !userId) {
+      return {
+        success: false,
+        error: 'questionId & userId is required.',
+      };
+    }
 
     // Update the view count we are currently viewing
     await QuestionModel.findByIdAndUpdate(questionId, { $inc: { views: 1 } });

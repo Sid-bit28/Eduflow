@@ -10,7 +10,6 @@ import { revalidatePath } from 'next/cache';
 
 const createAnswer = async params => {
   try {
-    console.log(params);
     const session = await getServerSession(authOptions);
     if (!session) {
       return {
@@ -66,7 +65,7 @@ const getAnswers = async params => {
 
     if (!questionId) {
       return {
-        status: false,
+        success: false,
         error: 'questionId is required.',
       };
     }
@@ -96,6 +95,12 @@ const upvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -141,6 +146,12 @@ const downvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -185,11 +196,17 @@ const deleteAnswer = async params => {
     await connectDB();
 
     const { answerId, path } = params;
+    if (!answerId) {
+      return {
+        success: false,
+        error: 'answerId is required.',
+      };
+    }
 
     const answer = await AnswerModel.findById(answerId);
     if (!answer) {
       return {
-        status: false,
+        success: false,
         error: 'Answer not found.',
       };
     }

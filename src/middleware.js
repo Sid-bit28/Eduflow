@@ -22,9 +22,14 @@ export default withAuth(
         if (
           pathname === '/sign-in' ||
           pathname === '/sign-up' ||
-          pathname === '/'
+          pathname === '/' ||
+          pathname === '/questions'
         ) {
           return true;
+        }
+
+        if (pathname.startsWith('/questions/') && pathname !== '/questions') {
+          return !!token;
         }
         return !!token;
       },
@@ -33,5 +38,13 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/', '/sign-in', '/sign-up', '/ask-question'],
+  matcher: [
+    '/',
+    '/sign-in',
+    '/sign-up',
+    '/ask-question',
+    '/collection',
+    '/questions',
+    '/questions/(.*)',
+  ],
 };
