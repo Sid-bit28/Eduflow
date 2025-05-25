@@ -126,7 +126,6 @@ const getPopularTags = async params => {
       { $sort: { numberOfQuestions: -1 } },
       { $limit: 10 },
     ]);
-    console.log(popularTags);
 
     return {
       success: true,

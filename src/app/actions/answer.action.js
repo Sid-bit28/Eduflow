@@ -95,12 +95,6 @@ const upvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 
@@ -146,12 +140,6 @@ const downvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 

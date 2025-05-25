@@ -11,9 +11,11 @@ import ROUTES from '@/constants/routes';
 import Link from 'next/link';
 import React from 'react';
 
-const Page = async () => {
+const Page = async ({ searchParams }) => {
   try {
-    const response = await getQuestions();
+    const response = await getQuestions({
+      searchQuery: searchParams.q,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
     }

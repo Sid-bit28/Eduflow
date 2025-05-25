@@ -13,7 +13,14 @@ const getAllUsers = async params => {
   try {
     await connectDB();
 
-    const users = await UserModel.find({}).sort({ createdAt: -1 });
+    const { searchQuery } = params;
+
+    const query = {};
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
+    const users = await UserModel.find(query).sort({ createdAt: -1 });
 
     return {
       success: true,

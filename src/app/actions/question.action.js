@@ -14,7 +14,18 @@ const getQuestions = async params => {
   try {
     await connectDB();
 
-    const questions = await QuestionModel.find({})
+    const { searchQuery } = params;
+
+    // Search functionality for questions
+    const query = {};
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, 'i') } },
+        { content: { $regex: new RegExp(searchQuery, 'i') } },
+      ];
+    }
+
+    const questions = await QuestionModel.find(query)
       .populate({
         path: 'tags',
         model: TagModel,
@@ -145,12 +156,6 @@ const upvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 
@@ -164,6 +169,7 @@ const upvoteQuestion = async params => {
     } else {
       updateQuery = { $addToSet: { upvotes: userId } };
     }
+    console.log(updateQuery);
 
     const question = await QuestionModel.findByIdAndUpdate(
       questionId,
@@ -198,12 +204,6 @@ const downvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 
