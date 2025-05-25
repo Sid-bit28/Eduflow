@@ -1,6 +1,5 @@
 import ErrorComponent from '@/components/ErrorComponent';
 import QuestionForm from '@/components/forms/QuestionForm';
-import QuestionForm from '@/components/forms/QuestionForm';
 import React from 'react';
 
 const AskQuestion = () => {
