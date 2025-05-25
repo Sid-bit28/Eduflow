@@ -2,6 +2,8 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import AnswerModel from '@/models/Answer.Model';
+import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
@@ -48,6 +50,12 @@ const createQuestion = async params => {
     const author = session?.user?.id;
 
     const { title, content, tags, path } = params;
+    if (!title || !content || !tags) {
+      return {
+        success: false,
+        error: 'title, content & tags are required.',
+      };
+    }
 
     const question = await QuestionModel.create({
       title,
@@ -73,7 +81,6 @@ const createQuestion = async params => {
       $push: { tags: { $each: tagDocuments } },
     });
 
-    // Using this I am using SSR to revalidate the path which is actually much faster then 'use client' + useEffect to fetch the data client side.
     revalidatePath(path);
     return {
       success: true,
@@ -138,6 +145,12 @@ const upvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -185,6 +198,12 @@ const downvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -226,10 +245,111 @@ const downvoteQuestion = async params => {
   }
 };
 
+const deleteQuestion = async params => {
+  try {
+    await connectDB();
+
+    const { questionId, path } = params;
+    if (!questionId) {
+      return {
+        success: false,
+        error: 'questionId is required.',
+      };
+    }
+
+    await QuestionModel.deleteOne({ _id: questionId });
+    await AnswerModel.deleteMany({ question: questionId });
+    await InteractionModel.deleteMany({ question: questionId });
+    await TagModel.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Question successfully deleted.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to delete question.',
+    };
+  }
+};
+
+const editQuestion = async params => {
+  try {
+    await connectDB();
+
+    const { questionId, title, content, path } = params;
+    console.log(questionId, title);
+    if (!questionId || !title || !content) {
+      return {
+        success: false,
+        error: 'questionId, title, and content are required.',
+      };
+    }
+
+    const question = await QuestionModel.findById(questionId).populate('tags');
+    if (!question) {
+      return {
+        success: false,
+        error: 'question not found.',
+      };
+    }
+
+    console.log(question);
+
+    question.title = title;
+    question.content = content;
+
+    await question.save();
+    revalidatePath(path);
+
+    return {
+      success: true,
+      message: 'Question successfully edited.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to edit question.',
+    };
+  }
+};
+
+const getHotQuestions = async params => {
+  try {
+    await connectDB();
+
+    const hotQuestions = await QuestionModel.find({})
+      .sort({ views: -1, upvotes: -1 })
+      .limit(5);
+
+    return {
+      success: true,
+      message: 'Successfully fetched hot questions.',
+      hotQuestions: JSON.parse(JSON.stringify(hotQuestions)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch hot questions',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
   getQuestionById,
   upvoteQuestion,
   downvoteQuestion,
+  deleteQuestion,
+  editQuestion,
+  getHotQuestions,
 };

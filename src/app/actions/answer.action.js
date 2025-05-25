@@ -3,13 +3,13 @@
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
 import AnswerModel from '@/models/Answer.Model';
+import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 
 const createAnswer = async params => {
   try {
-    console.log(params);
     const session = await getServerSession(authOptions);
     if (!session) {
       return {
@@ -65,7 +65,7 @@ const getAnswers = async params => {
 
     if (!questionId) {
       return {
-        status: false,
+        success: false,
         error: 'questionId is required.',
       };
     }
@@ -95,6 +95,12 @@ const upvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -140,6 +146,12 @@ const downvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
+    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
+      return {
+        success: false,
+        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
+      };
+    }
 
     let updateQuery = {};
 
@@ -179,4 +191,42 @@ const downvoteAnswer = async params => {
   }
 };
 
-export { createAnswer, getAnswers, upvoteAnswer, downvoteAnswer };
+const deleteAnswer = async params => {
+  try {
+    await connectDB();
+
+    const { answerId, path } = params;
+    if (!answerId) {
+      return {
+        success: false,
+        error: 'answerId is required.',
+      };
+    }
+
+    const answer = await AnswerModel.findById(answerId);
+    if (!answer) {
+      return {
+        success: false,
+        error: 'Answer not found.',
+      };
+    }
+
+    await AnswerModel.deleteOne({ _id: answerId });
+    await QuestionModel.updateMany(
+      { _id: answer.question },
+      { $pull: { answer: answerId } }
+    );
+    await InteractionModel.deleteMany({ answer: answerId });
+
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'Answer deleted successfully.',
+    };
+  } catch (error) {
+    console.log(error);
+    throw new Error('Unable to delete answer.');
+  }
+};
+
+export { createAnswer, getAnswers, upvoteAnswer, downvoteAnswer, deleteAnswer };

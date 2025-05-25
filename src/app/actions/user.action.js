@@ -2,6 +2,8 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import AnswerModel from '@/models/Answer.Model';
+import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
 import { getServerSession } from 'next-auth';
@@ -74,12 +76,18 @@ const toggleSaveQuestion = async params => {
     await connectDB();
 
     const { userId, questionId, path } = params;
+    if (!userId || !questionId) {
+      return {
+        success: false,
+        error: 'userId & questionId is required.',
+      };
+    }
 
     const user = await UserModel.findById(userId);
 
     if (!userId) {
       return {
-        status: false,
+        success: false,
         error: 'User not found.',
       };
     }
@@ -112,7 +120,7 @@ const toggleSaveQuestion = async params => {
   } catch (error) {
     console.log(error);
     return {
-      status: false,
+      success: false,
       error: 'Toggle Save Question failed.',
     };
   }
@@ -171,4 +179,182 @@ const getSavedQuestions = async params => {
   }
 };
 
-export { getAllUsers, getUserById, toggleSaveQuestion, getSavedQuestions };
+const getUserInfo = async params => {
+  try {
+    await connectDB();
+
+    const { userId } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found.',
+      };
+    }
+
+    const totalQuestions = await QuestionModel.countDocuments({
+      author: user._id,
+    });
+
+    const totalAnswers = await AnswerModel.countDocuments({ author: user._id });
+
+    return {
+      success: true,
+      user: JSON.parse(JSON.stringify(user)),
+      totalQuestions,
+      totalAnswers,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch user.',
+    };
+  }
+};
+
+const getLoggedInUserInfo = async params => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return {
+        success: true,
+        message: 'Session not found.',
+      };
+    }
+
+    return {
+      success: true,
+      userId: session?.user?.id,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'User not logged In.',
+    };
+  }
+};
+
+const getUserQuestions = async params => {
+  try {
+    await connectDB();
+
+    const { userId, page = 1, pageSize = 10 } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
+
+    const totalQuestions = await QuestionModel.countDocuments({
+      author: userId,
+    });
+
+    const userQuestions = await QuestionModel.find({ author: userId })
+      .sort({
+        views: -1,
+        upvotes: -1,
+      })
+      .populate('tags', '_id name')
+      .populate('author', '_id name picture');
+
+    return {
+      success: true,
+      totalQuestions: JSON.parse(JSON.stringify(totalQuestions)),
+      questions: JSON.parse(JSON.stringify(userQuestions)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch questions.',
+    };
+  }
+};
+
+const getUserAnswers = async params => {
+  try {
+    await connectDB();
+
+    const { userId, page = 1, pageSize = 10 } = params;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'userId is required.',
+      };
+    }
+
+    const totalAnswers = await AnswerModel.countDocuments({
+      author: userId,
+    });
+
+    const userAnswers = await AnswerModel.find({ author: userId })
+      .sort({
+        upvotes: -1,
+      })
+      .populate('question', '_id title')
+      .populate('author', '_id name picture');
+
+    return {
+      success: true,
+      totalAnswers: JSON.parse(JSON.stringify(totalAnswers)),
+      answers: JSON.parse(JSON.stringify(userAnswers)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch questions.',
+    };
+  }
+};
+
+const updateUser = async params => {
+  try {
+    await connectDB();
+
+    const { userId, updateData, path } = params;
+    if (!userId || !updateData) {
+      return {
+        success: false,
+        error: 'userId, and updateData is required.',
+      };
+    }
+    console.log(userId, updateData);
+    await UserModel.findOneAndUpdate({ _id: userId }, updateData, {
+      new: true,
+    });
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'User succesfully updated.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to edit user',
+    };
+  }
+};
+
+export {
+  getAllUsers,
+  getUserById,
+  toggleSaveQuestion,
+  getSavedQuestions,
+  getUserInfo,
+  getLoggedInUserInfo,
+  getUserQuestions,
+  getUserAnswers,
+  updateUser,
+};
