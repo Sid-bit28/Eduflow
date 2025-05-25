@@ -321,6 +321,28 @@ const editQuestion = async params => {
   }
 };
 
+const getHotQuestions = async params => {
+  try {
+    await connectDB();
+
+    const hotQuestions = await QuestionModel.find({})
+      .sort({ views: -1, upvotes: -1 })
+      .limit(5);
+
+    return {
+      success: true,
+      message: 'Successfully fetched hot questions.',
+      hotQuestions: JSON.parse(JSON.stringify(hotQuestions)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch hot questions',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
@@ -329,4 +351,5 @@ export {
   downvoteQuestion,
   deleteQuestion,
   editQuestion,
+  getHotQuestions,
 };

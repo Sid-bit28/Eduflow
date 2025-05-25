@@ -117,4 +117,29 @@ const getQuestionByTagId = async params => {
   }
 };
 
-export { getTopInteractedTags, getAllTags, getQuestionByTagId };
+const getPopularTags = async params => {
+  try {
+    await connectDB();
+
+    const popularTags = await TagModel.aggregate([
+      { $project: { name: 1, numberOfQuestions: { $size: '$questions' } } },
+      { $sort: { numberOfQuestions: -1 } },
+      { $limit: 10 },
+    ]);
+    console.log(popularTags);
+
+    return {
+      success: true,
+      message: 'Successfully fetched popular tags.',
+      popularTags: JSON.parse(JSON.stringify(popularTags)),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch popular tags.',
+    };
+  }
+};
+
+export { getTopInteractedTags, getAllTags, getQuestionByTagId, getPopularTags };
