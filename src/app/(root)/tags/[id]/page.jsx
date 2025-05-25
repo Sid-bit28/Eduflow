@@ -12,7 +12,7 @@ const Page = async ({ params, searchParams }) => {
     const response = await getQuestionByTagId({
       tagId: id,
       page: 1,
-      searchQuery: searchParams.q,
+      searchQuery: await searchParams.q,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -27,7 +27,7 @@ const Page = async ({ params, searchParams }) => {
 
         <section className="mt-11 w-full">
           <LocalSearchbar
-            route={ROUTES.HOME}
+            route={ROUTES.TAG(id)}
             iconPosition="left"
             imgSrc="/icons/search.svg"
             placeholder="Search tag questions..."

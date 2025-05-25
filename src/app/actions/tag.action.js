@@ -48,7 +48,15 @@ const getTopInteractedTags = async params => {
 const getAllTags = async params => {
   try {
     await connectDB();
-    const tags = await TagModel.find({}).sort({ createdAt: -1 });
+
+    const { searchQuery } = params;
+
+    const query = {};
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
+    const tags = await TagModel.find(query).sort({ createdAt: -1 });
 
     return {
       success: true,
@@ -78,12 +86,15 @@ const getQuestionByTagId = async params => {
 
     const tagFilter = { _id: tagId };
 
+    const query = {};
+    if (searchQuery) {
+      query.$or = [{ title: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
     const tag = await TagModel.findById(tagFilter).populate({
       path: 'questions',
       model: QuestionModel,
-      match: searchQuery
-        ? { title: { $regex: searchQuery, $options: 'i' } }
-        : {},
+      match: query,
       options: {
         sort: { createdAt: -1 },
       },

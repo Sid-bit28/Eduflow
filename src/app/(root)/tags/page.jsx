@@ -8,9 +8,9 @@ import NoResult from '@/components/NoResult';
 import { getAllTags } from '@/app/actions/tag.action';
 import ErrorComponent from '@/components/ErrorComponent';
 
-const Page = async () => {
+const Page = async ({ searchParams }) => {
   try {
-    const response = await getAllTags();
+    const response = await getAllTags({ searchQuery: await searchParams.q });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch tags.');
     }

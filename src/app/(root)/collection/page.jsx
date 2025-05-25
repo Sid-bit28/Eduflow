@@ -8,9 +8,12 @@ import { CollectionFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
 import React from 'react';
 
-const Page = async () => {
+const Page = async ({ searchParams }) => {
   try {
-    const response = await getSavedQuestions({ page: 1 });
+    const response = await getSavedQuestions({
+      page: 1,
+      searchQuery: await searchParams.q,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
     }
@@ -22,7 +25,7 @@ const Page = async () => {
 
         <section className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
           <LocalSearchbar
-            route={ROUTES.HOME}
+            route={ROUTES.COLLECTION}
             iconPosition="left"
             imgSrc="/icons/search.svg"
             placeholder="Search for questions..."
