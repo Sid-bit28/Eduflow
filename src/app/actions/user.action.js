@@ -318,6 +318,35 @@ const getUserAnswers = async params => {
   }
 };
 
+const updateUser = async params => {
+  try {
+    await connectDB();
+
+    const { userId, updateData, path } = params;
+    if (!userId || !updateData) {
+      return {
+        success: false,
+        error: 'userId, and updateData is required.',
+      };
+    }
+    console.log(userId, updateData);
+    await UserModel.findOneAndUpdate({ _id: userId }, updateData, {
+      new: true,
+    });
+    revalidatePath(path);
+    return {
+      success: true,
+      message: 'User succesfully updated.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to edit user',
+    };
+  }
+};
+
 export {
   getAllUsers,
   getUserById,
@@ -327,4 +356,5 @@ export {
   getLoggedInUserInfo,
   getUserQuestions,
   getUserAnswers,
+  updateUser,
 };

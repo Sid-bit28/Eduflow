@@ -71,3 +71,15 @@ export const QuestionsSchema = z.object({
 export const AnswerSchema = z.object({
   answer: z.string().min(100),
 });
+
+export const ProfileSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  portfolioWebsite: z
+    .string()
+    .url({ message: 'Invalid URL format.' })
+    .optional(),
+  location: z.string().optional(),
+  bio: z.string().max(500, {
+    message: 'Bio must not exceed 500 characters.',
+  }),
+});

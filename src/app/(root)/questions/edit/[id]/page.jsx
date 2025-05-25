@@ -8,14 +8,6 @@ const Page = async ({ params }) => {
   try {
     const { id } = await params;
 
-    const getLoggedInUserInfoResponse = await getLoggedInUserInfo();
-    if (!getLoggedInUserInfoResponse.success) {
-      throw new Error(
-        getLoggedInUserInfoResponse?.error || 'Internal Server Error'
-      );
-    }
-    const userId = getLoggedInUserInfoResponse?.userId;
-
     const getQuestionByIdResponse = await getQuestionById({ questionId: id });
     if (!getQuestionByIdResponse.success) {
       throw new Error(
@@ -31,7 +23,6 @@ const Page = async ({ params }) => {
         <div className="mt-9">
           <QuestionForm
             type="Edit"
-            userId={userId}
             questionDetails={JSON.stringify(question)}
           />
         </div>

@@ -22,47 +22,68 @@ import Image from 'next/image';
 import { toast } from 'sonner';
 import ROUTES from '@/constants/routes';
 import { usePathname, useRouter } from 'next/navigation';
-import { createQuestion } from '@/app/actions/question.action';
+import { createQuestion, editQuestion } from '@/app/actions/question.action';
 import ErrorComponent from '../ErrorComponent';
 
 const Editor = dynamic(() => import('@/components/editor'), {
   ssr: false,
 });
 
-const type = 'create';
-
-const QuestionForm = () => {
+const QuestionForm = ({ type, questionDetails }) => {
   try {
     const editorRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
 
+    const parsedQuestionDetails = JSON.parse(questionDetails || '');
+    const groupedTags = parsedQuestionDetails.tags.map(tag => tag.name);
+
     const form = useForm({
       resolver: zodResolver(QuestionsSchema),
       defaultValues: {
-        title: '',
-        content: '',
-        tags: [],
+        title: parsedQuestionDetails.title || '',
+        content: parsedQuestionDetails.content || '',
+        tags: groupedTags || [],
       },
     });
 
     const handleFormSubmit = async values => {
       setIsLoading(true);
-      const payLoad = {
-        title: values.title,
-        content: values.content,
-        tags: values.tags,
-        path: pathname,
-      };
-      const response = await createQuestion(payLoad);
-      if (!response?.success) {
-        toast.error(response?.error || 'Internal Server Error');
+
+      if (type === 'Edit') {
+        const payLoad = {
+          questionId: parsedQuestionDetails._id,
+          title: values.title,
+          content: values.content,
+          path: pathname,
+        };
+        console.log(payLoad);
+        const response = await editQuestion(payLoad);
+        console.log(response);
+        if (!response?.success) {
+          toast.error(response?.error || 'Internal Server Error');
+        }
+        toast.success(response?.message);
+        form.reset();
+        editorRef.current.setContent('');
+        router.push(`/questions/${parsedQuestionDetails._id}`);
+      } else {
+        const payLoad = {
+          title: values.title,
+          content: values.content,
+          tags: values.tags,
+          path: pathname,
+        };
+        const response = await createQuestion(payLoad);
+        if (!response?.success) {
+          toast.error(response?.error || 'Internal Server Error');
+        }
+        toast.success(response?.message);
+        form.reset();
+        editorRef.current.setContent('');
+        router.push(ROUTES.HOME);
       }
-      toast.success(response?.message);
-      form.reset();
-      editorRef.current.setContent('');
-      router.push(ROUTES.HOME);
       setIsLoading(false);
     };
 
@@ -225,9 +246,9 @@ const QuestionForm = () => {
             disabled={isLoading}
           >
             {isLoading ? (
-              <>{type === 'edit' ? 'Editing...' : 'Posting...'}</>
+              <>{type === 'Edit' ? 'Editing...' : 'Posting...'}</>
             ) : (
-              <>{type === 'edit' ? 'Edit Question' : 'Ask a Question'}</>
+              <>{type === 'Edit' ? 'Edit Question' : 'Ask a Question'}</>
             )}
           </Button>
         </form>

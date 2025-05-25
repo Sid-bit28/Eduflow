@@ -19,10 +19,21 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
+
         if (
+          pathname.startsWith('/_next/') ||
+          pathname.includes('.') || // Files with extensions
+          pathname.startsWith('/favicon.ico') ||
+          pathname.startsWith('/images/') ||
+          pathname.startsWith('/icons/')
+        ) {
+          return true;
+        }
+
+        if (
+          pathname === '/' ||
           pathname === '/sign-in' ||
           pathname === '/sign-up' ||
-          pathname === '/' ||
           pathname === '/questions'
         ) {
           return true;
@@ -46,5 +57,6 @@ export const config = {
     '/collection',
     '/questions',
     '/questions/(.*)',
+    '/profile/(.*)',
   ],
 };

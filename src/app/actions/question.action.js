@@ -279,6 +279,48 @@ const deleteQuestion = async params => {
   }
 };
 
+const editQuestion = async params => {
+  try {
+    await connectDB();
+
+    const { questionId, title, content, path } = params;
+    console.log(questionId, title);
+    if (!questionId || !title || !content) {
+      return {
+        success: false,
+        error: 'questionId, title, and content are required.',
+      };
+    }
+
+    const question = await QuestionModel.findById(questionId).populate('tags');
+    if (!question) {
+      return {
+        success: false,
+        error: 'question not found.',
+      };
+    }
+
+    console.log(question);
+
+    question.title = title;
+    question.content = content;
+
+    await question.save();
+    revalidatePath(path);
+
+    return {
+      success: true,
+      message: 'Question successfully edited.',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to edit question.',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
@@ -286,4 +328,5 @@ export {
   upvoteQuestion,
   downvoteQuestion,
   deleteQuestion,
+  editQuestion,
 };
