@@ -49,14 +49,30 @@ const getAllTags = async params => {
   try {
     await connectDB();
 
-    const { searchQuery } = params;
+    const { searchQuery, filter } = params;
 
     const query = {};
     if (searchQuery) {
       query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
     }
 
-    const tags = await TagModel.find(query).sort({ createdAt: -1 });
+    let sortOptions = {};
+    switch (filter) {
+      case 'name':
+        sortOptions = { name: 1 };
+        break;
+      case 'recent':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'popular':
+        sortOptions = { questions: -1 };
+        break;
+    }
+
+    const tags = await TagModel.find(query).sort(sortOptions);
 
     return {
       success: true,

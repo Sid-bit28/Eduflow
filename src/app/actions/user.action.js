@@ -13,14 +13,28 @@ const getAllUsers = async params => {
   try {
     await connectDB();
 
-    const { searchQuery } = params;
+    const { searchQuery, filter } = params;
 
     const query = {};
     if (searchQuery) {
       query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
     }
 
-    const users = await UserModel.find(query).sort({ createdAt: -1 });
+    let sortOptions = {};
+
+    switch (filter) {
+      case 'newest':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'popular':
+        sortOptions = { reputation: -1 };
+        break;
+    }
+
+    const users = await UserModel.find(query).sort(sortOptions);
 
     return {
       success: true,
@@ -151,11 +165,33 @@ const getSavedQuestions = async params => {
       ? { title: { $regex: new RegExp(searchQuery, 'i') } }
       : {};
 
+    let sortOptions = {};
+
+    switch (filter) {
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'most_voted':
+        sortOptions = { upvotes: -1 };
+        break;
+      case 'most_viewed':
+        sortOptions = { views: 1 };
+        break;
+      case 'most_recent':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'most_answered':
+        sortOptions = { answers: -1 };
+        break;
+    }
+
+    await connectDB();
+
     const user = await UserModel.findById(userId).populate({
       path: 'saved',
       match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOptions,
       },
       populate: [
         { path: 'tags', model: TagModel, select: '_id name' },

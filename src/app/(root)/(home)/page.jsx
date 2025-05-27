@@ -4,6 +4,7 @@ import ErrorComponent from '@/components/ErrorComponent';
 import CommonFilter from '@/components/filters/CommonFilter';
 import HomeFilter from '@/components/filters/HomeFilter';
 import NoResult from '@/components/NoResult';
+import Pagination from '@/components/Pagination';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
@@ -13,8 +14,10 @@ import React from 'react';
 
 const Page = async ({ searchParams }) => {
   try {
+    const { q, filter } = await searchParams;
     const response = await getQuestions({
-      searchQuery: await searchParams.q,
+      searchQuery: q,
+      filter: filter,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -84,6 +87,12 @@ const Page = async ({ searchParams }) => {
             />
           )}
         </section>
+        <div className="mt-10">
+          <Pagination
+            pageNumber={searchParams?.page ? +searchParams.page : 1}
+            isNext={response?.isNext}
+          />
+        </div>
       </>
     );
   } catch (error) {

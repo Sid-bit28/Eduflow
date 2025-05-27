@@ -10,9 +10,11 @@ import React from 'react';
 
 const Page = async ({ searchParams }) => {
   try {
+    const { q, filter } = await searchParams;
     const response = await getSavedQuestions({
       page: 1,
-      searchQuery: await searchParams.q,
+      searchQuery: q,
+      filter: filter,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -35,7 +37,6 @@ const Page = async ({ searchParams }) => {
           <CommonFilter
             filters={CollectionFilters}
             otherClasses="min-h-[56px] w-full"
-            containerClasses="hidden max-md:flex"
           />
         </section>
 

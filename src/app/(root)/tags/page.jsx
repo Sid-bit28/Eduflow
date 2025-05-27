@@ -10,7 +10,8 @@ import ErrorComponent from '@/components/ErrorComponent';
 
 const Page = async ({ searchParams }) => {
   try {
-    const response = await getAllTags({ searchQuery: await searchParams.q });
+    const { q, filter } = await searchParams;
+    const response = await getAllTags({ searchQuery: q, filter: filter });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch tags.');
     }

@@ -14,7 +14,7 @@ const getQuestions = async params => {
   try {
     await connectDB();
 
-    const { searchQuery } = params;
+    const { searchQuery, filter } = params;
 
     // Search functionality for questions
     const query = {};
@@ -25,13 +25,28 @@ const getQuestions = async params => {
       ];
     }
 
+    let sortOptions = {};
+    switch (filter) {
+      case 'newest':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'popular':
+        sortOptions = { views: -1 };
+        break;
+      case 'unanswered':
+        query.answers = { $size: 0 };
+        break;
+      default:
+        break;
+    }
+
     const questions = await QuestionModel.find(query)
       .populate({
         path: 'tags',
         model: TagModel,
       })
       .populate({ path: 'author', model: UserModel })
-      .sort({ createdAt: -1 });
+      .sort(sortOptions);
 
     return {
       success: true,

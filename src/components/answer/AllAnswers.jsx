@@ -1,7 +1,6 @@
 import React from 'react';
 import CommonFilter from '../filters/CommonFilter';
 import { AnswerFilters } from '@/constants/filters';
-import Axios from '@/lib/Axios';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getTimeStamp } from '@/lib/utils';
@@ -10,9 +9,12 @@ import { getAnswers } from '@/app/actions/answer.action';
 import Votes from '../votes/Votes';
 import ErrorComponent from '../ErrorComponent';
 
-const AllAnswers = async ({ questionId, userId, totalAnswers }) => {
+const AllAnswers = async ({ questionId, userId, totalAnswers, filter }) => {
   try {
-    const response = await getAnswers({ questionId: JSON.parse(questionId) });
+    const response = await getAnswers({
+      questionId: JSON.parse(questionId),
+      filter,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch answers');
     }

@@ -13,10 +13,10 @@ export const AnswerFilters = [
 
 export const CollectionFilters = [
   { name: 'Oldest', value: 'oldest' },
-  { name: 'Most Voted', value: 'mostvoted' },
-  { name: 'Most Viewed', value: 'mostviewed' },
-  { name: 'Most Recent', value: 'mostrecent' },
-  { name: 'Most Answered', value: 'mostanswered' },
+  { name: 'Most Voted', value: 'most_voted' },
+  { name: 'Most Viewed', value: 'most_viewed' },
+  { name: 'Most Recent', value: 'most_recent' },
+  { name: 'Most Answered', value: 'most_answered' },
 ];
 
 export const TagFilters = [

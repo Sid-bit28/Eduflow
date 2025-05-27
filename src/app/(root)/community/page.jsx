@@ -10,8 +10,10 @@ import React from 'react';
 
 const Page = async ({ searchParams }) => {
   try {
+    const { q, filter } = await searchParams;
     const response = await getAllUsers({
-      searchQuery: await searchParams.q,
+      searchQuery: q,
+      filter: filter,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
