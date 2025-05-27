@@ -2,12 +2,14 @@ import { getUserQuestions } from '@/app/actions/user.action';
 import React from 'react';
 import QuestionCard from '../cards/QuestionCard';
 import ErrorComponent from '../ErrorComponent';
+import Pagination from '../Pagination';
 
 const QuestionTab = async ({ searchParams, userId }) => {
   try {
+    const { page } = await searchParams;
     const response = await getUserQuestions({
       userId,
-      page: 1,
+      page: page ? +page : 1,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -28,6 +30,9 @@ const QuestionTab = async ({ searchParams, userId }) => {
             createdAt={question.createdAt}
           />
         ))}
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </>
     );
   } catch (error) {

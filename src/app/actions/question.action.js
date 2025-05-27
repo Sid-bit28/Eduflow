@@ -14,7 +14,10 @@ const getQuestions = async params => {
   try {
     await connectDB();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 2 } = params;
+    // Calculate the number of posts to skip based on the page number and page size
+
+    const skipAmount = (page - 1) * pageSize;
 
     // Search functionality for questions
     const query = {};
@@ -24,7 +27,6 @@ const getQuestions = async params => {
         { content: { $regex: new RegExp(searchQuery, 'i') } },
       ];
     }
-
     let sortOptions = {};
     switch (filter) {
       case 'newest':
@@ -46,11 +48,17 @@ const getQuestions = async params => {
         model: TagModel,
       })
       .populate({ path: 'author', model: UserModel })
+      .skip(skipAmount)
+      .limit(pageSize)
       .sort(sortOptions);
+
+    const totalQuestions = await QuestionModel.countDocuments(query);
+    const isNext = totalQuestions > skipAmount + questions.length;
 
     return {
       success: true,
       message: 'Fetched all question successfully.',
+      isNext,
       questions: JSON.parse(JSON.stringify(questions)),
     };
   } catch (error) {

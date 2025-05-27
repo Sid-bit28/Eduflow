@@ -2,10 +2,15 @@ import { getUserAnswers } from '@/app/actions/user.action';
 import React from 'react';
 import AnswerCard from '../cards/AnswerCard';
 import ErrorComponent from '../ErrorComponent';
+import Pagination from '../Pagination';
 
 const AnswerTab = async ({ searchParams, userId }) => {
   try {
-    const response = await getUserAnswers({ userId: userId, page: 1 });
+    const { page } = await searchParams;
+    const response = await getUserAnswers({
+      userId: userId,
+      page: page ? +page : 1,
+    });
     if (!response.success) {
       throw new Error(response?.error || 'Internal Server Error');
     }
@@ -24,6 +29,9 @@ const AnswerTab = async ({ searchParams, userId }) => {
             createdAt={answer.createdAt}
           />
         ))}
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </>
     );
   } catch (error) {

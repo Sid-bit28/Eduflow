@@ -7,11 +7,16 @@ import TagCard from '@/components/cards/TagCard';
 import NoResult from '@/components/NoResult';
 import { getAllTags } from '@/app/actions/tag.action';
 import ErrorComponent from '@/components/ErrorComponent';
+import Pagination from '@/components/Pagination';
 
 const Page = async ({ searchParams }) => {
   try {
-    const { q, filter } = await searchParams;
-    const response = await getAllTags({ searchQuery: q, filter: filter });
+    const { q, filter, page } = await searchParams;
+    const response = await getAllTags({
+      searchQuery: q,
+      filter: filter,
+      page: page ? +page : 1,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch tags.');
     }
@@ -46,6 +51,9 @@ const Page = async ({ searchParams }) => {
             />
           )}
         </section>
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </div>
     );
   } catch (error) {

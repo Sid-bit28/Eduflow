@@ -8,12 +8,20 @@ import MarkdownRenderer from '../questions/MarkdownRenderer';
 import { getAnswers } from '@/app/actions/answer.action';
 import Votes from '../votes/Votes';
 import ErrorComponent from '../ErrorComponent';
+import Pagination from '../Pagination';
 
-const AllAnswers = async ({ questionId, userId, totalAnswers, filter }) => {
+const AllAnswers = async ({
+  questionId,
+  userId,
+  totalAnswers,
+  filter,
+  page,
+}) => {
   try {
     const response = await getAnswers({
       questionId: JSON.parse(questionId),
       filter,
+      page: page ? +page : 1,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch answers');
@@ -74,6 +82,9 @@ const AllAnswers = async ({ questionId, userId, totalAnswers, filter }) => {
               </MarkdownRenderer>
             </article>
           ))}
+        </div>
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
         </div>
       </div>
     );

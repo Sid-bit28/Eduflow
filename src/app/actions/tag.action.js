@@ -49,7 +49,8 @@ const getAllTags = async params => {
   try {
     await connectDB();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+    const skipAmount = (page - 1) * pageSize;
 
     const query = {};
     if (searchQuery) {
@@ -72,11 +73,17 @@ const getAllTags = async params => {
         break;
     }
 
-    const tags = await TagModel.find(query).sort(sortOptions);
+    const tags = await TagModel.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
 
+    const totalTags = await TagModel.countDocuments(query);
+    const isNext = totalTags > skipAmount + tags.length;
     return {
       success: true,
       message: 'Tags fetched successfully.',
+      isNext,
       tags: JSON.parse(JSON.stringify(tags)),
     };
   } catch (error) {
@@ -93,6 +100,7 @@ const getQuestionByTagId = async params => {
     await connectDB();
 
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+    const skipAmount = (page - 1) * pageSize;
     if (!tagId) {
       return {
         success: false,
@@ -113,6 +121,8 @@ const getQuestionByTagId = async params => {
       match: query,
       options: {
         sort: { createdAt: -1 },
+        skip: skipAmount,
+        limit: pageSize + 1,
       },
       populate: [
         { path: 'tags', model: TagModel, select: '_id name' },
@@ -128,10 +138,12 @@ const getQuestionByTagId = async params => {
     }
 
     const questions = tag.questions;
+    const isNext = questions.length > pageSize;
 
     return {
       success: true,
       message: 'Fetched Saved Questions Successfully.',
+      isNext,
       tagTitle: tag.name,
       questions: JSON.parse(JSON.stringify(questions)),
     };

@@ -3,6 +3,7 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import ErrorComponent from '@/components/ErrorComponent';
 import CommonFilter from '@/components/filters/CommonFilter';
 import NoResult from '@/components/NoResult';
+import Pagination from '@/components/Pagination';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { CollectionFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
@@ -10,9 +11,9 @@ import React from 'react';
 
 const Page = async ({ searchParams }) => {
   try {
-    const { q, filter } = await searchParams;
+    const { q, filter, page } = await searchParams;
     const response = await getSavedQuestions({
-      page: 1,
+      page: page ? +page : 1,
       searchQuery: q,
       filter: filter,
     });
@@ -67,6 +68,9 @@ const Page = async ({ searchParams }) => {
             />
           )}
         </section>
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </>
     );
   } catch (error) {

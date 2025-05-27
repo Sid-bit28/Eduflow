@@ -13,7 +13,8 @@ const getAllUsers = async params => {
   try {
     await connectDB();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 1 } = params;
+    const skipAmount = (page - 1) * pageSize;
 
     const query = {};
     if (searchQuery) {
@@ -34,11 +35,17 @@ const getAllUsers = async params => {
         break;
     }
 
-    const users = await UserModel.find(query).sort(sortOptions);
+    const users = await UserModel.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
 
+    const totalUsers = await UserModel.countDocuments(query);
+    const isNext = totalUsers > skipAmount + users.length;
     return {
       success: true,
       message: 'Users fetched successfully.',
+      isNext,
       users: JSON.parse(JSON.stringify(users)),
     };
   } catch (error) {
@@ -160,6 +167,7 @@ const getSavedQuestions = async params => {
     const userId = session?.user?.id;
 
     const { page = 1, pageSize = 10, filter, searchQuery } = params;
+    const skipAmount = (page - 1) * pageSize;
 
     const query = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, 'i') } }
@@ -192,6 +200,8 @@ const getSavedQuestions = async params => {
       match: query,
       options: {
         sort: sortOptions,
+        skip: skipAmount,
+        limit: pageSize + 1,
       },
       populate: [
         { path: 'tags', model: TagModel, select: '_id name' },
@@ -199,6 +209,7 @@ const getSavedQuestions = async params => {
       ],
     });
 
+    const isNext = user.saved.length > pageSize;
     if (!user) {
       return {
         success: false,
@@ -211,6 +222,7 @@ const getSavedQuestions = async params => {
     return {
       success: true,
       message: 'Fetched Saved Questions Successfully.',
+      isNext,
       savedQuestions: JSON.parse(JSON.stringify(savedQuestions)),
     };
   } catch (error) {
@@ -290,7 +302,8 @@ const getUserQuestions = async params => {
   try {
     await connectDB();
 
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId, page = 1, pageSize = 5 } = params;
+    const skipAmount = (page - 1) * pageSize;
     if (!userId) {
       return {
         success: false,
@@ -308,10 +321,16 @@ const getUserQuestions = async params => {
         upvotes: -1,
       })
       .populate('tags', '_id name')
-      .populate('author', '_id name picture');
+      .populate('author', '_id name picture')
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const isNext = totalQuestions > skipAmount + userQuestions.length;
 
     return {
       success: true,
+      message: 'User Questions fetched successfully.',
+      isNext,
       totalQuestions: JSON.parse(JSON.stringify(totalQuestions)),
       questions: JSON.parse(JSON.stringify(userQuestions)),
     };
@@ -329,6 +348,7 @@ const getUserAnswers = async params => {
     await connectDB();
 
     const { userId, page = 1, pageSize = 10 } = params;
+    const skipAmount = (page - 1) * pageSize;
     if (!userId) {
       return {
         success: false,
@@ -345,10 +365,15 @@ const getUserAnswers = async params => {
         upvotes: -1,
       })
       .populate('question', '_id title')
-      .populate('author', '_id name picture');
+      .populate('author', '_id name picture')
+      .skip(skipAmount)
+      .limit(pageSize);
 
+    const isNext = totalAnswers > skipAmount + userAnswers.length;
     return {
       success: true,
+      message: 'User Answers fetched successfully.',
+      isNext,
       totalAnswers: JSON.parse(JSON.stringify(totalAnswers)),
       answers: JSON.parse(JSON.stringify(userAnswers)),
     };

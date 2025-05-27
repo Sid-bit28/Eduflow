@@ -14,10 +14,11 @@ import React from 'react';
 
 const Page = async ({ searchParams }) => {
   try {
-    const { q, filter } = await searchParams;
+    const { q, filter, page } = await searchParams;
     const response = await getQuestions({
       searchQuery: q,
       filter: filter,
+      page: page ? +page : 1,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -88,10 +89,7 @@ const Page = async ({ searchParams }) => {
           )}
         </section>
         <div className="mt-10">
-          <Pagination
-            pageNumber={searchParams?.page ? +searchParams.page : 1}
-            isNext={response?.isNext}
-          />
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
         </div>
       </>
     );
