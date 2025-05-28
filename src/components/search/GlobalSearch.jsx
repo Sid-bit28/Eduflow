@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -12,11 +12,32 @@ const GlobalSearch = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchContainerRef = useRef(null);
 
   // This is the one in which is getting used during the local search.
   const query = searchParams.get('q');
   const [search, setSearch] = useState(query || '');
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = event => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        setSearch('');
+      }
+    };
+
+    setIsOpen(false);
+
+    document.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -42,7 +63,10 @@ const GlobalSearch = () => {
   }, [search, router, pathname, searchParams, query]);
 
   return (
-    <div className="relative w-full max-w-[600px] max-lg:hidden">
+    <div
+      className="relative w-full max-w-[600px] max-lg:hidden"
+      ref={searchContainerRef}
+    >
       <div className="bg-light-800 dark:bg-transparent relative flex min-h-[56px] grow items-center gap-1 rounded-xl p-2">
         <Image
           src={'/icons/search.svg'}

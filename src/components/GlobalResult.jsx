@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Suspense } from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import GlobalFilters from './filters/GlobalFilters';
+import { globalSearch } from '@/app/actions/general.action';
+import ROUTES from '@/constants/routes';
 
 const GlobalResult = () => {
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState([
     {
       type: 'question',
@@ -32,18 +36,37 @@ const GlobalResult = () => {
   useEffect(() => {
     const fetchResult = async () => {
       setResult([]);
-
+      setIsLoading(true);
       try {
         // Search Everything.
+        const response = await globalSearch({ query: global, type });
+        setResult(response?.results);
       } catch (error) {
         console.log(error);
         throw new Error(error || 'Internal Server Error.');
+      } finally {
+        setIsLoading(false);
       }
     };
+    if (global) {
+      fetchResult();
+    }
   }, [global, type]);
 
   const renderLink = (type, id) => {
-    return '/';
+    switch (type) {
+      case 'question':
+        return ROUTES.QUESTION(id);
+      case 'answer':
+        return ROUTES.QUESTION(id);
+      case 'user':
+        return ROUTES.PROFILE(id);
+      case 'tag':
+        return ROUTES.TAG(id);
+
+      default:
+        return '/';
+    }
   };
   return (
     <div className="absolute top-full z-10 mt-3 w-full bg-light-800 py-5 shadow-sm dark:bg-dark-400 rounded-xl">
@@ -55,12 +78,19 @@ const GlobalResult = () => {
           Top Match
         </p>
 
-        <Suspense fallback={<LoadingSpinner />}>
+        {isLoading ? (
+          <div className="flex flex-col px-5 justify-center items-center">
+            <LoadingSpinner />
+            <p className="text-dark200_light800 body-regular">
+              Browsing the entire database.
+            </p>
+          </div>
+        ) : (
           <div className="flex flex-col gap-2">
             {result.length > 0 ? (
               result.map((item, index) => (
                 <Link
-                  href={renderLink('type', 'id')}
+                  href={renderLink(item.type, item.id)}
                   key={item.type + item.id + index}
                   className="flex w-full cursor-pointer items-start gap-3 px-5 py-2.5 hover:background-light-700/50 dark:hover:bg-dark-500/50"
                 >
@@ -89,7 +119,7 @@ const GlobalResult = () => {
               </div>
             )}
           </div>
-        </Suspense>
+        )}
       </div>
     </div>
   );
