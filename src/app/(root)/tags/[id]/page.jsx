@@ -2,6 +2,7 @@ import { getQuestionByTagId } from '@/app/actions/tag.action';
 import QuestionCard from '@/components/cards/QuestionCard';
 import ErrorComponent from '@/components/ErrorComponent';
 import NoResult from '@/components/NoResult';
+import Pagination from '@/components/Pagination';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import ROUTES from '@/constants/routes';
 import React from 'react';
@@ -9,10 +10,12 @@ import React from 'react';
 const Page = async ({ params, searchParams }) => {
   try {
     const { id } = await params;
+    const { q, page } = await searchParams;
     const response = await getQuestionByTagId({
       tagId: id,
       page: 1,
-      searchQuery: searchParams.q,
+      searchQuery: q,
+      page: page ? +page : 1,
     });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
@@ -27,7 +30,7 @@ const Page = async ({ params, searchParams }) => {
 
         <section className="mt-11 w-full">
           <LocalSearchbar
-            route={ROUTES.HOME}
+            route={ROUTES.TAG(id)}
             iconPosition="left"
             imgSrc="/icons/search.svg"
             placeholder="Search tag questions..."
@@ -62,6 +65,9 @@ const Page = async ({ params, searchParams }) => {
             />
           )}
         </section>
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </>
     );
   } catch (error) {

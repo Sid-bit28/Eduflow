@@ -1,7 +1,6 @@
 import React from 'react';
 import CommonFilter from '../filters/CommonFilter';
 import { AnswerFilters } from '@/constants/filters';
-import Axios from '@/lib/Axios';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getTimeStamp } from '@/lib/utils';
@@ -9,10 +8,21 @@ import MarkdownRenderer from '../questions/MarkdownRenderer';
 import { getAnswers } from '@/app/actions/answer.action';
 import Votes from '../votes/Votes';
 import ErrorComponent from '../ErrorComponent';
+import Pagination from '../Pagination';
 
-const AllAnswers = async ({ questionId, userId, totalAnswers }) => {
+const AllAnswers = async ({
+  questionId,
+  userId,
+  totalAnswers,
+  filter,
+  page,
+}) => {
   try {
-    const response = await getAnswers({ questionId: JSON.parse(questionId) });
+    const response = await getAnswers({
+      questionId: JSON.parse(questionId),
+      filter,
+      page: page ? +page : 1,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Failed to fetch answers');
     }
@@ -72,6 +82,9 @@ const AllAnswers = async ({ questionId, userId, totalAnswers }) => {
               </MarkdownRenderer>
             </article>
           ))}
+        </div>
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
         </div>
       </div>
     );

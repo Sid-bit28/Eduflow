@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn, formUrlQuery } from '@/lib/utils';
 import React from 'react';
 import {
   Select,
@@ -10,11 +10,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const CommonFilter = ({ filters, otherClasses, containerClasses }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const paramsFilter = searchParams.get('filter');
+
+  const handleUpdateParams = value => {
+    const newURL = formUrlQuery({
+      params: searchParams.toString(),
+      key: 'filter',
+      value,
+    });
+    router.push(newURL, { scroll: false });
+  };
   return (
     <div className={cn('relative', containerClasses)}>
-      <Select onValueChange={() => {}} defaultValue={''}>
+      <Select
+        onValueChange={handleUpdateParams}
+        defaultValue={paramsFilter || undefined}
+      >
         <SelectTrigger
           className={cn(
             'body-regular no-focus light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5',

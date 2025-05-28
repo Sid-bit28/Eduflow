@@ -12,9 +12,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-const QuestionPage = async ({ params }) => {
+const QuestionPage = async ({ params, searchParams }) => {
   try {
     const { id } = await params;
+    const { filter } = await searchParams;
 
     const getQuestionByIdResponse = await getQuestionById({ questionId: id });
     if (!getQuestionByIdResponse?.success) {
@@ -109,6 +110,7 @@ const QuestionPage = async ({ params }) => {
           questionId={JSON.stringify(id)}
           userId={JSON.stringify(user?._id)}
           totalAnswers={questionData?.answers?.length}
+          filter={filter}
         />
 
         <AnswerForm

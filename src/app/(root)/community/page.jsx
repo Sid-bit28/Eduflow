@@ -2,15 +2,21 @@ import { getAllUsers } from '@/app/actions/user.action';
 import UserCard from '@/components/cards/UserCard';
 import ErrorComponent from '@/components/ErrorComponent';
 import CommonFilter from '@/components/filters/CommonFilter';
+import Pagination from '@/components/Pagination';
 import LocalSearchbar from '@/components/search/LocalSearchbar';
 import { UserFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
 import Link from 'next/link';
 import React from 'react';
 
-const Page = async () => {
+const Page = async ({ searchParams }) => {
   try {
-    const response = await getAllUsers();
+    const { q, filter, page } = await searchParams;
+    const response = await getAllUsers({
+      searchQuery: q,
+      filter: filter,
+      page: page ? +page : 1,
+    });
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
     }
@@ -48,6 +54,10 @@ const Page = async () => {
             </div>
           )}
         </section>
+
+        <div className="mt-10">
+          <Pagination pageNumber={page ? +page : 1} isNext={response?.isNext} />
+        </div>
       </div>
     );
   } catch (error) {

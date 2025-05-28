@@ -36,14 +36,15 @@ const QuestionForm = ({ type, questionDetails }) => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const parsedQuestionDetails = JSON.parse(questionDetails || '');
-    const groupedTags = parsedQuestionDetails.tags.map(tag => tag.name);
+    const parsedQuestionDetails =
+      questionDetails && JSON.parse(questionDetails || '');
+    const groupedTags = parsedQuestionDetails?.tags.map(tag => tag.name);
 
     const form = useForm({
       resolver: zodResolver(QuestionsSchema),
       defaultValues: {
-        title: parsedQuestionDetails.title || '',
-        content: parsedQuestionDetails.content || '',
+        title: parsedQuestionDetails?.title || '',
+        content: parsedQuestionDetails?.content || '',
         tags: groupedTags || [],
       },
     });
@@ -58,9 +59,7 @@ const QuestionForm = ({ type, questionDetails }) => {
           content: values.content,
           path: pathname,
         };
-        console.log(payLoad);
         const response = await editQuestion(payLoad);
-        console.log(response);
         if (!response?.success) {
           toast.error(response?.error || 'Internal Server Error');
         }

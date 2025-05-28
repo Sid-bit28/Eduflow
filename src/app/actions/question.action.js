@@ -14,17 +14,51 @@ const getQuestions = async params => {
   try {
     await connectDB();
 
-    const questions = await QuestionModel.find({})
+    const { searchQuery, filter, page = 1, pageSize = 2 } = params;
+    // Calculate the number of posts to skip based on the page number and page size
+
+    const skipAmount = (page - 1) * pageSize;
+
+    // Search functionality for questions
+    const query = {};
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, 'i') } },
+        { content: { $regex: new RegExp(searchQuery, 'i') } },
+      ];
+    }
+    let sortOptions = {};
+    switch (filter) {
+      case 'newest':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'popular':
+        sortOptions = { views: -1 };
+        break;
+      case 'unanswered':
+        query.answers = { $size: 0 };
+        break;
+      default:
+        break;
+    }
+
+    const questions = await QuestionModel.find(query)
       .populate({
         path: 'tags',
         model: TagModel,
       })
       .populate({ path: 'author', model: UserModel })
-      .sort({ createdAt: -1 });
+      .skip(skipAmount)
+      .limit(pageSize)
+      .sort(sortOptions);
+
+    const totalQuestions = await QuestionModel.countDocuments(query);
+    const isNext = totalQuestions > skipAmount + questions.length;
 
     return {
       success: true,
       message: 'Fetched all question successfully.',
+      isNext,
       questions: JSON.parse(JSON.stringify(questions)),
     };
   } catch (error) {
@@ -145,12 +179,6 @@ const upvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 
@@ -164,6 +192,7 @@ const upvoteQuestion = async params => {
     } else {
       updateQuery = { $addToSet: { upvotes: userId } };
     }
+    console.log(updateQuery);
 
     const question = await QuestionModel.findByIdAndUpdate(
       questionId,
@@ -198,12 +227,6 @@ const downvoteQuestion = async params => {
     await connectDB();
 
     const { questionId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!questionId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'questionId, userId, hasUpvoted & hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 

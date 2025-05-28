@@ -61,7 +61,8 @@ const createAnswer = async params => {
 
 const getAnswers = async params => {
   try {
-    const { questionId } = params;
+    const { questionId, page = 1, pageSize = 5 } = params;
+    const skipAmount = (page - 1) * pageSize;
 
     if (!questionId) {
       return {
@@ -74,11 +75,18 @@ const getAnswers = async params => {
 
     const answers = await AnswerModel.find({ question: questionId })
       .populate('author', '_id name picture')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skipAmount)
+      .limit(pageSize);
+    const totalAnswers = await AnswerModel.countDocuments({
+      question: questionId,
+    });
+    const isNext = totalAnswers > skipAmount + answers.length;
 
     return {
       success: true,
       message: 'Answer fetched successfully.',
+      isNext,
       answers: JSON.parse(JSON.stringify(answers)),
     };
   } catch (error) {
@@ -95,12 +103,6 @@ const upvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 
@@ -146,12 +148,6 @@ const downvoteAnswer = async params => {
     await connectDB();
 
     const { answerId, userId, hasUpvoted, hasDownvoted, path } = params;
-    if (!answerId || !userId || !hasUpvoted || !hasDownvoted) {
-      return {
-        success: false,
-        error: 'answerId, userId, hasUpvoted, hasDownvoted is required.',
-      };
-    }
 
     let updateQuery = {};
 

@@ -48,11 +48,42 @@ const getTopInteractedTags = async params => {
 const getAllTags = async params => {
   try {
     await connectDB();
-    const tags = await TagModel.find({}).sort({ createdAt: -1 });
 
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+    const skipAmount = (page - 1) * pageSize;
+
+    const query = {};
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
+    let sortOptions = {};
+    switch (filter) {
+      case 'name':
+        sortOptions = { name: 1 };
+        break;
+      case 'recent':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'popular':
+        sortOptions = { questions: -1 };
+        break;
+    }
+
+    const tags = await TagModel.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const totalTags = await TagModel.countDocuments(query);
+    const isNext = totalTags > skipAmount + tags.length;
     return {
       success: true,
       message: 'Tags fetched successfully.',
+      isNext,
       tags: JSON.parse(JSON.stringify(tags)),
     };
   } catch (error) {
@@ -69,6 +100,7 @@ const getQuestionByTagId = async params => {
     await connectDB();
 
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+    const skipAmount = (page - 1) * pageSize;
     if (!tagId) {
       return {
         success: false,
@@ -78,14 +110,19 @@ const getQuestionByTagId = async params => {
 
     const tagFilter = { _id: tagId };
 
+    const query = {};
+    if (searchQuery) {
+      query.$or = [{ title: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
     const tag = await TagModel.findById(tagFilter).populate({
       path: 'questions',
       model: QuestionModel,
-      match: searchQuery
-        ? { title: { $regex: searchQuery, $options: 'i' } }
-        : {},
+      match: query,
       options: {
         sort: { createdAt: -1 },
+        skip: skipAmount,
+        limit: pageSize + 1,
       },
       populate: [
         { path: 'tags', model: TagModel, select: '_id name' },
@@ -101,10 +138,12 @@ const getQuestionByTagId = async params => {
     }
 
     const questions = tag.questions;
+    const isNext = questions.length > pageSize;
 
     return {
       success: true,
       message: 'Fetched Saved Questions Successfully.',
+      isNext,
       tagTitle: tag.name,
       questions: JSON.parse(JSON.stringify(questions)),
     };
@@ -126,7 +165,6 @@ const getPopularTags = async params => {
       { $sort: { numberOfQuestions: -1 } },
       { $limit: 10 },
     ]);
-    console.log(popularTags);
 
     return {
       success: true,

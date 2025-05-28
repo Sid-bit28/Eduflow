@@ -7,9 +7,7 @@ import {
   upvoteQuestion,
 } from '@/app/actions/question.action';
 import { toggleSaveQuestion } from '@/app/actions/user.action';
-import Axios from '@/lib/Axios';
 import { formatNumber } from '@/lib/utils';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
@@ -25,7 +23,6 @@ const Votes = ({
   hasDownvoted,
   hasSaved,
 }) => {
-  const session = useSession();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -48,10 +45,6 @@ const Votes = ({
   };
 
   const handleVote = async action => {
-    if (!session) {
-      return;
-    }
-
     if (action === 'upvote') {
       if (type === 'Question') {
         const payLoad = {
@@ -61,7 +54,9 @@ const Votes = ({
           hasDownvoted,
           path: pathname,
         };
+        console.log(payLoad);
         const response = await upvoteQuestion(payLoad);
+        console.log(response);
         if (response?.success) {
           toast.success(response?.message);
           router.refresh();
