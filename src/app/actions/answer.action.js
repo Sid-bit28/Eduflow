@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/authOptions';
 import AnswerModel from '@/models/Answer.Model';
 import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
+import UserModel from '@/models/User.Model';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 
@@ -38,11 +39,20 @@ const createAnswer = async params => {
     });
 
     // Add the answer to the question's answers array
-    await QuestionModel.findByIdAndUpdate(question, {
+    const questionObject = await QuestionModel.findByIdAndUpdate(question, {
       $push: { answers: answer._id },
     });
 
     // TODO: Add interactions
+    await InteractionModel.create({
+      user: author,
+      action: 'answer',
+      question,
+      answer: new answer._id(),
+      tags: questionObject.tags,
+    });
+
+    await UserModel.findByIdAndUpdate(author, { $inc: { reputation: 10 } });
 
     revalidatePath(path);
     return {
@@ -128,6 +138,14 @@ const upvoteAnswer = async params => {
       };
     }
 
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpvoted ? -2 : 2 },
+    });
+
+    await UserModel.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasUpvoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
     return {
       success: true,
@@ -174,6 +192,14 @@ const downvoteAnswer = async params => {
     }
 
     // Increment author's reputation
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasDownvoted ? -2 : 2 },
+    });
+
+    await UserModel.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasDownvoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
     return {
       success: true,

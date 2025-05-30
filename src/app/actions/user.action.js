@@ -317,6 +317,7 @@ const getUserQuestions = async params => {
 
     const userQuestions = await QuestionModel.find({ author: userId })
       .sort({
+        createdAt: -1,
         views: -1,
         upvotes: -1,
       })

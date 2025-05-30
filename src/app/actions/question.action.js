@@ -115,6 +115,16 @@ const createQuestion = async params => {
       $push: { tags: { $each: tagDocuments } },
     });
 
+    // Create an interation record for the user's ask question action
+    await InteractionModel.create({
+      user: author,
+      action: 'ask_question',
+      question: question._id,
+      tags: tagDocuments,
+    });
+
+    // Increament author's reputation by +5 for creating a question
+    await UserModel.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
     revalidatePath(path);
     return {
       success: true,
@@ -206,14 +216,27 @@ const upvoteQuestion = async params => {
         error: 'Question not found.',
       };
     }
+    console.log(userId, question.author);
+    // Increment author's reputation
+
+    // Increment author's reputation by +1/-1 for upvoting/revoking an upvote to the question
+
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpvoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for upvoting/revoking an upvote to the question
+
+    await UserModel.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasUpvoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
+
     return {
       success: true,
       message: 'Question Upvoted Successfully.',
     };
-
-    // Increment author's reputation
   } catch (error) {
     return {
       success: false,
@@ -255,6 +278,14 @@ const downvoteQuestion = async params => {
     }
 
     // Increment author's reputation
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasDownvoted ? -2 : 2 },
+    });
+
+    await UserModel.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasDownvoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
     return {
       success: true,
