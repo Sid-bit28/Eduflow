@@ -22,6 +22,7 @@ const Page = async ({ params, searchParams }) => {
     const user = getUserInfoResponse?.user;
     const totalQuestions = getUserInfoResponse?.totalQuestions;
     const totalAnswers = getUserInfoResponse?.totalAnswers;
+    const badgeCounts = getUserInfoResponse?.badgeCounts;
 
     const getLoggedInUserInfoResponse = await getLoggedInUserInfo();
     if (!getLoggedInUserInfoResponse?.success) {
@@ -93,7 +94,11 @@ const Page = async ({ params, searchParams }) => {
           </div>
         </div>
 
-        <Stats totalQuestions={totalQuestions} totalAnswers={totalAnswers} />
+        <Stats
+          totalQuestions={totalQuestions}
+          totalAnswers={totalAnswers}
+          badgeCounts={badgeCounts}
+        />
 
         <div className="mt-10 flex gap-10">
           <Tabs>

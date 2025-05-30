@@ -2,7 +2,7 @@ import { formatNumber } from '@/lib/utils';
 import React from 'react';
 import StatsCard from './StatsCard';
 
-const Stats = ({ totalQuestions, totalAnswers }) => {
+const Stats = ({ totalQuestions, totalAnswers, badgeCounts }) => {
   return (
     <div className="mt-10">
       <h4 className="h3-semibold text-dark200_light900">Stats</h4>
@@ -25,17 +25,17 @@ const Stats = ({ totalQuestions, totalAnswers }) => {
 
         <StatsCard
           imgUrl="/icons/gold-medal.svg"
-          value={0}
+          value={badgeCounts?.GOLD}
           title="Gold Badges"
         />
         <StatsCard
           imgUrl="/icons/silver-medal.svg"
-          value={0}
+          value={badgeCounts?.SILVER}
           title="Silver Badges"
         />
         <StatsCard
           imgUrl="/icons/bronze-medal.svg"
-          value={0}
+          value={badgeCounts?.BRONZE}
           title="Bronze Badges"
         />
       </div>
