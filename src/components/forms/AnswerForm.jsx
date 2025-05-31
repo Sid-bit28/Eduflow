@@ -65,17 +65,19 @@ const AnswerForm = ({ question, questionId }) => {
           question: JSON.stringify(question),
         };
         const response = await Axios.post('/api/gemini', payLoad);
+        if (response?.status === 200) {
+          const AIAnswer = await response?.data?.reply;
 
-        const AIAnswer = await response.json();
-
-        const formattedAnswer = AIAnswer?.reply
-          .replace(/^```json\n/, '')
-          .replace(/\n```$/, '');
-        if (editorRef.current) {
-          const editor = editorRef.current;
-          editor.setContent(formattedAnswer);
+          const formattedAnswer = AIAnswer.replace(/^```json\n/, '').replace(
+            /\n```$/,
+            ''
+          );
+          if (editorRef.current) {
+            const editor = editorRef.current;
+            editor.setContent(formattedAnswer);
+          }
+          toast.success('AI Answer generated successfully.');
         }
-        toast.success('AI Answer generated successfully.');
       } catch (error) {
         console.log(error);
         toast.error('Failed to generate AI Answer.');
