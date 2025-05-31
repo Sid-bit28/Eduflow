@@ -397,6 +397,82 @@ const getHotQuestions = async params => {
   }
 };
 
+const getRecommendedQuestions = async params => {
+  try {
+    await connectDB();
+
+    const { page = 1, pageSize = 20, searchQuery } = params;
+
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      throw new Error('User not authenticated.');
+    }
+
+    const userId = session?.user?.id;
+
+    const skipAmount = (page - 1) * pageSize;
+
+    // Find the user's interactions
+    const userInteractions = await InteractionModel.find({ user: userId })
+      .populate('tags')
+      .exec();
+
+    // Extract the tags from the user's interactions
+    const userTags = userInteractions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags = tags.concat(interaction.tags);
+      }
+
+      return tags;
+    }, []);
+
+    // Get diatinct tag ID's from the user's interactions
+    const distinctUserTagIds = [...new Set(userTags.map(tag => tag.id))];
+
+    const query = {
+      $and: [
+        { tags: { $in: distinctUserTagIds } }, // Questions with user tags
+        { author: { $ne: userId } }, // Excluding user's own questions
+      ],
+    };
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { content: { $regex: searchQuery, $options: 'i' } },
+      ];
+    }
+
+    const totalQuestions = await QuestionModel.countDocuments(query);
+
+    const recommendedQuestions = await QuestionModel.find(query)
+      .populate({
+        path: 'tags',
+        model: TagModel,
+      })
+      .populate({
+        path: 'author',
+        model: UserModel,
+      })
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const isNext = totalQuestions > skipAmount + recommendedQuestions.length;
+
+    return {
+      success: true,
+      questions: JSON.parse(JSON.stringify(recommendedQuestions)),
+      isNext,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch recommended questions.',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
@@ -406,4 +482,5 @@ export {
   deleteQuestion,
   editQuestion,
   getHotQuestions,
+  getRecommendedQuestions,
 };

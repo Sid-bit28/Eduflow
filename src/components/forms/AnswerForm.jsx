@@ -61,7 +61,7 @@ const AnswerForm = ({ question, questionId }) => {
       setIsSubmittingAI(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/chatgpt`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/gemini`,
           {
             method: 'POST',
             body: JSON.stringify({ question }),
