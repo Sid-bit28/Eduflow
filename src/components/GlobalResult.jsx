@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -9,26 +9,10 @@ import GlobalFilters from './filters/GlobalFilters';
 import { globalSearch } from '@/app/actions/general.action';
 import ROUTES from '@/constants/routes';
 
-const GlobalResult = () => {
+const GlobalResultContent = () => {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState([
-    {
-      type: 'question',
-      id: 1,
-      title: 'Next.js is the best framework to work with.',
-    },
-    {
-      type: 'tag',
-      id: 1,
-      title: 'Javascript question.',
-    },
-    {
-      type: 'question',
-      id: 1,
-      title: 'Next.js question.',
-    },
-  ]);
+  const [result, setResult] = useState([]);
 
   const global = searchParams.get('global');
   const type = searchParams.get('type');
@@ -38,16 +22,15 @@ const GlobalResult = () => {
       setResult([]);
       setIsLoading(true);
       try {
-        // Search Everything.
         const response = await globalSearch({ query: global, type });
-        setResult(response?.results);
+        setResult(response?.results || []);
       } catch (error) {
-        console.log(error);
-        throw new Error(error || 'Internal Server Error.');
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
     };
+
     if (global) {
       fetchResult();
     }
@@ -63,11 +46,11 @@ const GlobalResult = () => {
         return ROUTES.PROFILE(id);
       case 'tag':
         return ROUTES.TAG(id);
-
       default:
         return '/';
     }
   };
+
   return (
     <div className="absolute top-full z-10 mt-3 w-full bg-light-800 py-5 shadow-sm dark:bg-dark-400 rounded-xl">
       <GlobalFilters />
@@ -91,7 +74,7 @@ const GlobalResult = () => {
               result.map((item, index) => (
                 <Link
                   href={renderLink(item.type, item.id)}
-                  key={item.type + item.id + index}
+                  key={`${item.type}-${item.id}-${index}`}
                   className="flex w-full cursor-pointer items-start gap-3 px-5 py-2.5 hover:background-light-700/50 dark:hover:bg-dark-500/50"
                 >
                   <Image
@@ -114,7 +97,9 @@ const GlobalResult = () => {
             ) : (
               <div className="flex-center flex-col px-5">
                 <p className="text-dark200_light800 body-regular px-5 py-2.5">
-                  Oops, no results found.
+                  {global
+                    ? 'Oops, no results found.'
+                    : 'Search for something...'}
                 </p>
               </div>
             )}
@@ -122,6 +107,27 @@ const GlobalResult = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const GlobalResult = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="absolute top-full z-10 mt-3 w-full bg-light-800 py-5 shadow-sm dark:bg-dark-400 rounded-xl">
+          <GlobalFilters />
+          <div className="my-5 h-[1px] bg-light-700/50 dark:bg-light-500/50" />
+          <div className="flex flex-col px-5 justify-center items-center py-10">
+            <LoadingSpinner />
+            <p className="text-dark200_light800 body-regular mt-2">
+              Loading search parameters...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <GlobalResultContent />
+    </Suspense>
   );
 };
 
