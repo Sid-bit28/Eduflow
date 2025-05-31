@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { ResetPasswordSchema } from '@/lib/Validations';
+import ROUTES from '@/constants/routes';
 
 const ResetPasswordContent = () => {
   const form = useForm({
@@ -75,7 +76,7 @@ const ResetPasswordContent = () => {
       if (response.status === 200) {
         toast.success(response.data.message);
         form.reset();
-        router.push('/sign-in');
+        router.push(ROUTES.SIGN_IN);
       }
     } catch (error) {
       toast.error(error?.response?.data?.error);
@@ -158,7 +159,10 @@ const ResetPasswordContent = () => {
       <div className="max-w-md mx-auto">
         <p>
           Already have account ?{' '}
-          <Link href={'/sign-in'} className="text-primary-500 drop-shadow-md">
+          <Link
+            href={ROUTES.SIGN_IN}
+            className="text-primary-500 drop-shadow-md"
+          >
             Login
           </Link>
         </p>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -20,6 +19,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import Axios from '@/lib/Axios';
 import { ForgotPasswordSchema } from '@/lib/Validations';
+import ROUTES from '@/constants/routes';
 
 const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +86,10 @@ const ForgotPassword = () => {
       <div className="max-w-md mx-auto">
         <p>
           Already have account?{' '}
-          <Link href="/sign-in" className="text-primary-500 drop-shadow-md">
+          <Link
+            href={ROUTES.SIGN_IN}
+            className="text-primary-500 drop-shadow-md"
+          >
             Sign In
           </Link>
         </p>
