@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { z } from 'zod';
+
+import React, { useEffect, useState, Suspense } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
@@ -20,7 +20,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { ResetPasswordSchema } from '@/lib/Validations';
 
-const ResetPassword = () => {
+const ResetPasswordContent = () => {
   const form = useForm({
     resolver: zodResolver(ResetPasswordSchema),
   });
@@ -54,16 +54,14 @@ const ResetPassword = () => {
     }
   };
 
-  // Verify token
   useEffect(() => {
     if (resetPasswordToken) {
       verifyResetPasswordToken();
     } else {
       router.push('/forgot-password');
     }
-  }, []);
+  }, [resetPasswordToken, router]);
 
-  // 2. Define a submit handler.
   async function onSubmit(values) {
     const payload = {
       userId: userId,
@@ -166,6 +164,22 @@ const ResetPassword = () => {
         </p>
       </div>
     </div>
+  );
+};
+
+const ResetPassword = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="lg:p-10 space-y-7">
+          <Card>
+            <p className="mx-auto w-fit">Verifying your reset link...</p>
+          </Card>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 };
 
