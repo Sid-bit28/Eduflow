@@ -88,7 +88,7 @@ const AnswerForm = ({ question, questionId }) => {
 
     return (
       <div>
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-5">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-5 markdown">
           <h4 className="paragraph-semibold text-dark400_light800">
             Write your answer here..
           </h4>

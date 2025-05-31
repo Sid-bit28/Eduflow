@@ -39,7 +39,7 @@ const QuestionPage = async ({ params, searchParams }) => {
 
     return (
       <>
-        <div className="flex-start w-full flex-col markdown w-full min-w-full">
+        <div className="flex-start w-full flex-col w-full min-w-full">
           <div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
             <Link
               href={`/profile/${questionData?.author?._id}`}
@@ -74,7 +74,7 @@ const QuestionPage = async ({ params, searchParams }) => {
           </h2>
         </div>
 
-        <div className="mb-8 mt-5 flex flex-wrap gap-4">
+        <div className="mb-8 mt-5 flex flex-wrap gap-4 markdown w-full min-w-full">
           <Metric
             imgUrl="/icons/clock.svg"
             alt="Clock Icon"
@@ -96,35 +96,35 @@ const QuestionPage = async ({ params, searchParams }) => {
             title=" Views"
             textStyles="small-medium text-dark400_light800"
           />
-        </div>
-        <div className="markdown w-full min-w-full">
-          <MarkdownRenderer>
-            {questionData?.content?.replace(/(\[.*?\])/g, '$1\n')}
-          </MarkdownRenderer>
-        </div>
+          <div className="markdown min-w-full">
+            <MarkdownRenderer>
+              {questionData?.content?.replace(/(\[.*?\])/g, '$1\n')}
+            </MarkdownRenderer>
+          </div>
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          {questionData?.tags?.map(tag => (
-            <DataRenderer
-              key={tag._id}
-              _id={tag._id}
-              name={tag.name}
-              showCount={false}
-            />
-          ))}
+          <div className="mt-8 flex flex-wrap gap-2">
+            {questionData?.tags?.map(tag => (
+              <DataRenderer
+                key={tag._id}
+                _id={tag._id}
+                name={tag.name}
+                showCount={false}
+              />
+            ))}
+          </div>
+
+          <AllAnswers
+            questionId={JSON.stringify(id)}
+            userId={JSON.stringify(user?._id)}
+            totalAnswers={questionData?.answers?.length}
+            filter={filter}
+          />
+
+          <AnswerForm
+            question={questionData?.content}
+            questionId={JSON.stringify(questionData?._id)}
+          />
         </div>
-
-        <AllAnswers
-          questionId={JSON.stringify(id)}
-          userId={JSON.stringify(user?._id)}
-          totalAnswers={questionData?.answers?.length}
-          filter={filter}
-        />
-
-        <AnswerForm
-          question={questionData?.content}
-          questionId={JSON.stringify(questionData?._id)}
-        />
       </>
     );
   } catch (error) {

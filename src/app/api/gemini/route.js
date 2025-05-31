@@ -13,18 +13,10 @@ export async function POST(request) {
       model: 'gemini-2.0-flash',
       contents: `Tell me ${question}`,
     });
-    return NextResponse.json(
-      {
-        status: 200,
-        reply: response.text,
-      },
-      {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-        },
-      }
-    );
+    return NextResponse.json({
+      status: 200,
+      reply: response.text,
+    });
   } catch (error) {
     console.log(error);
     return NextResponse.json({
