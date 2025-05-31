@@ -67,7 +67,7 @@ const LocalSearchbar = ({
           setSearch(e.target.value);
         }}
         className={
-          '!paragraph-regular !no-focus !placeholder !border-none !shadow-none !outline-none'
+          '!paragraph-regular !no-focus !placeholder !border-none !shadow-none !outline-none text-dark400_light700 bg-transparent'
         }
       />
 

@@ -2,6 +2,7 @@
 
 import { connectDB } from '@/config/connectDB';
 import { authOptions } from '@/lib/authOptions';
+import { assignBadges } from '@/lib/utils';
 import AnswerModel from '@/models/Answer.Model';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
@@ -260,11 +261,65 @@ const getUserInfo = async params => {
 
     const totalAnswers = await AnswerModel.countDocuments({ author: user._id });
 
+    // Get question upvotes
+    const [questionUpvotes] = await QuestionModel.aggregate([
+      { $match: { author: user._id } },
+      {
+        $project: {
+          _id: 0,
+          upvotes: { $size: '$upvotes' },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUpvotes: { $sum: '$upvotes' },
+        },
+      },
+    ]);
+
+    const [answerUpvotes] = await AnswerModel.aggregate([
+      { $match: { author: user._id } },
+      {
+        $project: {
+          _id: 0,
+          upvotes: { $size: '$upvotes' },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUpvotes: { $sum: '$upvotes' },
+        },
+      },
+    ]);
+
+    const [questionViews] = await AnswerModel.aggregate([
+      { $match: { author: user._id } },
+      {
+        $group: {
+          _id: null,
+          totalViews: { $sum: '$views' },
+        },
+      },
+    ]);
+
+    const criteria = [
+      { type: 'QUESTION_COUNT', count: totalQuestions },
+      { type: 'ANSWER_COUNT', count: totalAnswers },
+      { type: 'QUESTION_UPVOTES', count: questionUpvotes?.totalUpvotes || 0 },
+      { type: 'ANSWER_UPVOTES', count: answerUpvotes?.totalUpvotes || 0 },
+      { type: 'TOTAL_VIEWS', count: questionViews?.totalViews || 0 },
+    ];
+
+    const badgeCounts = assignBadges({ criteria });
+
     return {
       success: true,
       user: JSON.parse(JSON.stringify(user)),
       totalQuestions,
       totalAnswers,
+      badgeCounts,
     };
   } catch (error) {
     console.log(error);
@@ -317,6 +372,7 @@ const getUserQuestions = async params => {
 
     const userQuestions = await QuestionModel.find({ author: userId })
       .sort({
+        createdAt: -1,
         views: -1,
         upvotes: -1,
       })

@@ -1,4 +1,7 @@
-import { getQuestions } from '@/app/actions/question.action';
+import {
+  getQuestions,
+  getRecommendedQuestions,
+} from '@/app/actions/question.action';
 import QuestionCard from '@/components/cards/QuestionCard';
 import ErrorComponent from '@/components/ErrorComponent';
 import CommonFilter from '@/components/filters/CommonFilter';
@@ -12,14 +15,32 @@ import ROUTES from '@/constants/routes';
 import Link from 'next/link';
 import React from 'react';
 
+export const metadata = {
+  title: 'Home | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ searchParams }) => {
   try {
     const { q, filter, page } = await searchParams;
-    const response = await getQuestions({
-      searchQuery: q,
-      filter: filter,
-      page: page ? +page : 1,
-    });
+    let response = {
+      questions: [],
+      isNext: false,
+    };
+
+    if (filter === 'recommended') {
+      response = await getRecommendedQuestions({
+        searchQuery: q,
+        page: page ? +page : 1,
+      });
+    } else {
+      response = await getQuestions({
+        searchQuery: q,
+        filter: filter,
+        page: page ? +page : 1,
+      });
+    }
     if (!response?.success) {
       throw new Error(response?.error || 'Internal Server Error');
     }

@@ -11,6 +11,12 @@ import QuestionTab from '@/components/profile/QuestionTab';
 import AnswerTab from '@/components/profile/AnswerTab';
 import ErrorComponent from '@/components/ErrorComponent';
 
+export const metadata = {
+  title: 'Profile | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ params, searchParams }) => {
   try {
     const userId = await params.id;
@@ -22,6 +28,7 @@ const Page = async ({ params, searchParams }) => {
     const user = getUserInfoResponse?.user;
     const totalQuestions = getUserInfoResponse?.totalQuestions;
     const totalAnswers = getUserInfoResponse?.totalAnswers;
+    const badgeCounts = getUserInfoResponse?.badgeCounts;
 
     const getLoggedInUserInfoResponse = await getLoggedInUserInfo();
     if (!getLoggedInUserInfoResponse?.success) {
@@ -93,7 +100,11 @@ const Page = async ({ params, searchParams }) => {
           </div>
         </div>
 
-        <Stats totalQuestions={totalQuestions} totalAnswers={totalAnswers} />
+        <Stats
+          totalQuestions={totalQuestions}
+          totalAnswers={totalAnswers}
+          badgeCounts={badgeCounts}
+        />
 
         <div className="mt-10 flex gap-10">
           <Tabs>

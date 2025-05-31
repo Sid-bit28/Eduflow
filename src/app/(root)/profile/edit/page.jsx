@@ -5,6 +5,11 @@ import ROUTES from '@/constants/routes';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
+export const metadata = {
+  title: 'Edit Profile | DevOverflow',
+  description: 'Edit your profile and get answers from the community.',
+};
+
 const Page = async ({ params }) => {
   try {
     const getUserByIdResponse = await getUserById();

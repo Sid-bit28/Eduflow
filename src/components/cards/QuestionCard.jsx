@@ -61,27 +61,30 @@ const QuestionCard = async ({
             isAuthor
             textStyles="body-medium text-dark400_light700"
           />
-          <Metric
-            imgUrl="/icons/like.svg"
-            alt="upvotes"
-            value={formatNumber(upvotes.length)}
-            title=" Votes"
-            textStyles="small-medium text-dark400_light800"
-          />
-          <Metric
-            imgUrl="/icons/message.svg"
-            alt="message"
-            value={formatNumber(answers.length)}
-            title=" Answers"
-            textStyles="small-medium text-dark400_light800"
-          />
-          <Metric
-            imgUrl="/icons/eye.svg"
-            alt="eye"
-            value={formatNumber(views)}
-            title=" Views"
-            textStyles="small-medium text-dark400_light800"
-          />
+
+          <div className="flex items-center gap-3 max-sm:flex-wrap max-sm:justify-start">
+            <Metric
+              imgUrl="/icons/like.svg"
+              alt="upvotes"
+              value={formatNumber(upvotes.length)}
+              title=" Votes"
+              textStyles="small-medium text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/icons/message.svg"
+              alt="message"
+              value={formatNumber(answers.length)}
+              title=" Answers"
+              textStyles="small-medium text-dark400_light800"
+            />
+            <Metric
+              imgUrl="/icons/eye.svg"
+              alt="eye"
+              value={formatNumber(views)}
+              title=" Views"
+              textStyles="small-medium text-dark400_light800"
+            />
+          </div>
         </div>
       </div>
     );

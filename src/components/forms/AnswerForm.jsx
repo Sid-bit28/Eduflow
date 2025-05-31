@@ -18,11 +18,14 @@ import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { createAnswer } from '@/app/actions/answer.action';
 import ErrorComponent from '../ErrorComponent';
+import { useSession } from 'next-auth/react';
 
 const AnswerForm = ({ question, questionId }) => {
   try {
+    const session = useSession();
     const pathname = usePathname();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmittingAI, setIsSubmittingAI] = useState(false);
     const editorRef = useRef(null);
     const form = useForm({
       resolver: zodResolver(AnswerSchema),
@@ -49,6 +52,40 @@ const AnswerForm = ({ question, questionId }) => {
       setIsSubmitting(false);
     };
 
+    const generateAIAnswer = async () => {
+      if (!session) {
+        toast.error('Please login to generate AI Answer.');
+        return;
+      }
+
+      setIsSubmittingAI(true);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/gemini`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ question }),
+          }
+        );
+
+        const AIAnswer = await response.json();
+
+        const formattedAnswer = AIAnswer.reply
+          .replace(/^```json\n/, '')
+          .replace(/\n```$/, '');
+        if (editorRef.current) {
+          const editor = editorRef.current;
+          editor.setContent(formattedAnswer);
+        }
+        toast.success('AI Answer generated successfully.');
+      } catch (error) {
+        console.log(error);
+        toast.error('Failed to generate AI Answer.');
+      } finally {
+        setIsSubmittingAI(false);
+      }
+    };
+
     return (
       <div>
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-5">
@@ -59,16 +96,22 @@ const AnswerForm = ({ question, questionId }) => {
             className={
               'btn light-border-2 gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-dark200_light900 transition-all duration-200 ease-in-out hover:bg-light100 focus:outline-none focus:ring-2 focus:ring-light100 focus:ring-offset-2 dark:border-dark300_light700 dark:bg-dark100 dark:text-dark300_light700 dark:hover:bg-dark200 dark:focus:ring-offset-0 sm:mt-0 cursor-pointer'
             }
-            onClick={() => {}}
+            onClick={generateAIAnswer}
           >
-            <Image
-              src="/icons/stars.svg"
-              alt="star"
-              width={12}
-              height={12}
-              className="object-contain"
-            />
-            Generate an AI Answer
+            {isSubmittingAI ? (
+              <>Generating...</>
+            ) : (
+              <>
+                <Image
+                  src="/icons/stars.svg"
+                  alt="star"
+                  width={12}
+                  height={12}
+                  className="object-contain"
+                />
+                Generate AI Answer
+              </>
+            )}
           </Button>
         </div>
         <Form {...form}>

@@ -115,6 +115,16 @@ const createQuestion = async params => {
       $push: { tags: { $each: tagDocuments } },
     });
 
+    // Create an interation record for the user's ask question action
+    await InteractionModel.create({
+      user: author,
+      action: 'ask_question',
+      question: question._id,
+      tags: tagDocuments,
+    });
+
+    // Increament author's reputation by +5 for creating a question
+    await UserModel.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
     revalidatePath(path);
     return {
       success: true,
@@ -206,14 +216,27 @@ const upvoteQuestion = async params => {
         error: 'Question not found.',
       };
     }
+    console.log(userId, question.author);
+    // Increment author's reputation
+
+    // Increment author's reputation by +1/-1 for upvoting/revoking an upvote to the question
+
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpvoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for upvoting/revoking an upvote to the question
+
+    await UserModel.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasUpvoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
+
     return {
       success: true,
       message: 'Question Upvoted Successfully.',
     };
-
-    // Increment author's reputation
   } catch (error) {
     return {
       success: false,
@@ -255,6 +278,14 @@ const downvoteQuestion = async params => {
     }
 
     // Increment author's reputation
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasDownvoted ? -2 : 2 },
+    });
+
+    await UserModel.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasDownvoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
     return {
       success: true,
@@ -366,6 +397,82 @@ const getHotQuestions = async params => {
   }
 };
 
+const getRecommendedQuestions = async params => {
+  try {
+    await connectDB();
+
+    const { page = 1, pageSize = 20, searchQuery } = params;
+
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      throw new Error('User not authenticated.');
+    }
+
+    const userId = session?.user?.id;
+
+    const skipAmount = (page - 1) * pageSize;
+
+    // Find the user's interactions
+    const userInteractions = await InteractionModel.find({ user: userId })
+      .populate('tags')
+      .exec();
+
+    // Extract the tags from the user's interactions
+    const userTags = userInteractions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags = tags.concat(interaction.tags);
+      }
+
+      return tags;
+    }, []);
+
+    // Get diatinct tag ID's from the user's interactions
+    const distinctUserTagIds = [...new Set(userTags.map(tag => tag.id))];
+
+    const query = {
+      $and: [
+        { tags: { $in: distinctUserTagIds } }, // Questions with user tags
+        { author: { $ne: userId } }, // Excluding user's own questions
+      ],
+    };
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { content: { $regex: searchQuery, $options: 'i' } },
+      ];
+    }
+
+    const totalQuestions = await QuestionModel.countDocuments(query);
+
+    const recommendedQuestions = await QuestionModel.find(query)
+      .populate({
+        path: 'tags',
+        model: TagModel,
+      })
+      .populate({
+        path: 'author',
+        model: UserModel,
+      })
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const isNext = totalQuestions > skipAmount + recommendedQuestions.length;
+
+    return {
+      success: true,
+      questions: JSON.parse(JSON.stringify(recommendedQuestions)),
+      isNext,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: 'Unable to fetch recommended questions.',
+    };
+  }
+};
+
 export {
   createQuestion,
   getQuestions,
@@ -375,4 +482,5 @@ export {
   deleteQuestion,
   editQuestion,
   getHotQuestions,
+  getRecommendedQuestions,
 };

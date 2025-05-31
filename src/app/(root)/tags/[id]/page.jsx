@@ -7,6 +7,12 @@ import LocalSearchbar from '@/components/search/LocalSearchbar';
 import ROUTES from '@/constants/routes';
 import React from 'react';
 
+export const metadata = {
+  title: 'Tag | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ params, searchParams }) => {
   try {
     const { id } = await params;

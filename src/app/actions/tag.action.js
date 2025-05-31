@@ -1,6 +1,7 @@
 'use server';
 
 import { connectDB } from '@/config/connectDB';
+import InteractionModel from '@/models/Interaction.Model';
 import QuestionModel from '@/models/Question.Model';
 import TagModel from '@/models/Tag.Model';
 import UserModel from '@/models/User.Model';
@@ -26,10 +27,32 @@ const getTopInteractedTags = async params => {
       };
     }
 
-    const tags = [
-      { _id: '1', name: 'tag1' },
-      { _id: '2', name: 'tag2' },
-    ];
+    // Find the user's interactions
+    const userInteractions = await InteractionModel.find({ user: userId })
+      .populate('tags')
+      .exec();
+
+    // Extract the tags from the user's interactions
+    const userTags = userInteractions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags = tags.concat(interaction.tags);
+      }
+
+      return tags;
+    }, []);
+
+    // Get diatinct tag ID's from the user's interactions
+    const distinctUserTagIds = [...new Set(userTags.map(tag => tag.id))];
+    console.log(distinctUserTagIds);
+
+    const tags = [];
+
+    for (const tagId of distinctUserTagIds) {
+      const tag = await TagModel.findById(tagId);
+      if (tag) {
+        tags.push(tag);
+      }
+    }
 
     return {
       success: true,

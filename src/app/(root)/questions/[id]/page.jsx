@@ -12,6 +12,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
+export const metadata = {
+  title: 'Question | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const QuestionPage = async ({ params, searchParams }) => {
   try {
     const { id } = await params;
@@ -33,7 +39,7 @@ const QuestionPage = async ({ params, searchParams }) => {
 
     return (
       <>
-        <div className="flex-start w-full flex-col">
+        <div className="flex-start w-full flex-col markdown w-full min-w-full">
           <div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
             <Link
               href={`/profile/${questionData?.author?._id}`}
@@ -91,9 +97,11 @@ const QuestionPage = async ({ params, searchParams }) => {
             textStyles="small-medium text-dark400_light800"
           />
         </div>
-        <MarkdownRenderer>
-          {questionData?.content?.replace(/(\[.*?\])/g, '$1\n')}
-        </MarkdownRenderer>
+        <div className="markdown w-full min-w-full">
+          <MarkdownRenderer>
+            {questionData?.content?.replace(/(\[.*?\])/g, '$1\n')}
+          </MarkdownRenderer>
+        </div>
 
         <div className="mt-8 flex flex-wrap gap-2">
           {questionData?.tags?.map(tag => (
