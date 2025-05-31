@@ -2,6 +2,11 @@ import ErrorComponent from '@/components/ErrorComponent';
 import QuestionForm from '@/components/forms/QuestionForm';
 import React from 'react';
 
+export const metadata = {
+  title: 'Ask a Question | DevOverflow',
+  description: 'Ask a question and get answers from the community.',
+};
+
 const AskQuestion = () => {
   try {
     return (

@@ -9,6 +9,12 @@ import { getAllTags } from '@/app/actions/tag.action';
 import ErrorComponent from '@/components/ErrorComponent';
 import Pagination from '@/components/Pagination';
 
+export const metadata = {
+  title: 'Tags | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ searchParams }) => {
   try {
     const { q, filter, page } = await searchParams;

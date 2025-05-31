@@ -9,6 +9,12 @@ import { CollectionFilters } from '@/constants/filters';
 import ROUTES from '@/constants/routes';
 import React from 'react';
 
+export const metadata = {
+  title: 'Saved Questions | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ searchParams }) => {
   try {
     const { q, filter, page } = await searchParams;

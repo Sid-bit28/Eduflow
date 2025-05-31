@@ -11,6 +11,12 @@ import QuestionTab from '@/components/profile/QuestionTab';
 import AnswerTab from '@/components/profile/AnswerTab';
 import ErrorComponent from '@/components/ErrorComponent';
 
+export const metadata = {
+  title: 'Profile | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ params, searchParams }) => {
   try {
     const userId = await params.id;

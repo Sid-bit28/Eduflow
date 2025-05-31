@@ -12,6 +12,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
+export const metadata = {
+  title: 'Question | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const QuestionPage = async ({ params, searchParams }) => {
   try {
     const { id } = await params;

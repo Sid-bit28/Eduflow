@@ -12,6 +12,12 @@ import ROUTES from '@/constants/routes';
 import Link from 'next/link';
 import React from 'react';
 
+export const metadata = {
+  title: 'Home | DevOverflow',
+  description:
+    'A community-driven platform for asking and answering questions.',
+};
+
 const Page = async ({ searchParams }) => {
   try {
     const { q, filter, page } = await searchParams;
