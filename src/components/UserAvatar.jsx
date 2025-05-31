@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { signOut, useSession } from 'next-auth/react';
 import { getAvatarName } from '@/lib/getAvatarName';
+import ROUTES from '@/constants/routes';
 
 const UserAvatar = () => {
   const session = useSession();
@@ -25,7 +26,7 @@ const UserAvatar = () => {
         <div className="p-[0.5px] bg-gray-200"></div>
         <Button
           className="w-full mt-4 cursor-pointer text-white bg-red-600/80 hover:bg-red-600 font-spaceGrotesk"
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: ROUTES.HOME })}
         >
           Logout
         </Button>

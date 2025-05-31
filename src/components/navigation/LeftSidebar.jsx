@@ -51,7 +51,7 @@ const LeftSidebar = () => {
         ) : (
           <Button
             className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none cursor-pointer"
-            onClick={() => signOut()}
+            onClick={() => signOut({ callbackUrl: ROUTES.HOME })}
           >
             <Image
               src={'/icons/trash.svg'}
