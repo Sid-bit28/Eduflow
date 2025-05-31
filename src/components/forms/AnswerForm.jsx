@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { createAnswer } from '@/app/actions/answer.action';
 import ErrorComponent from '../ErrorComponent';
 import { useSession } from 'next-auth/react';
+import Axios from '@/lib/Axios';
 
 const AnswerForm = ({ question, questionId }) => {
   try {
@@ -60,13 +61,10 @@ const AnswerForm = ({ question, questionId }) => {
 
       setIsSubmittingAI(true);
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/gemini`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ question }),
-          }
-        );
+        const payLoad = {
+          question: JSON.stringify(question),
+        };
+        const response = await Axios.post('/api/gemini', payLoad);
 
         const AIAnswer = await response.json();
 
