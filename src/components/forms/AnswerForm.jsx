@@ -70,7 +70,7 @@ const AnswerForm = ({ question, questionId }) => {
 
         const AIAnswer = await response.json();
 
-        const formattedAnswer = AIAnswer.reply
+        const formattedAnswer = AIAnswer?.reply
           .replace(/^```json\n/, '')
           .replace(/\n```$/, '');
         if (editorRef.current) {
