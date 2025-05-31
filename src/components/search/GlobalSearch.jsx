@@ -1,20 +1,20 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils';
 import GlobalResult from '../GlobalResult';
+import { Skeleton } from '../ui/skeleton';
 
-const GlobalSearch = () => {
+const GlobalSearchContent = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchContainerRef = useRef(null);
 
-  // This is the one in which is getting used during the local search.
   const query = searchParams.get('q');
   const [search, setSearch] = useState(query || '');
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,6 @@ const GlobalSearch = () => {
     };
 
     setIsOpen(false);
-
     document.addEventListener('click', handleOutsideClick);
 
     return () => {
@@ -93,6 +92,23 @@ const GlobalSearch = () => {
       </div>
       {isOpen && <GlobalResult />}
     </div>
+  );
+};
+
+const GlobalSearch = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="relative w-full max-w-[600px] max-lg:hidden">
+          <div className="bg-light-800 dark:bg-transparent relative flex min-h-[56px] grow items-center gap-1 rounded-xl p-2">
+            <Skeleton className="h-6 w-6 rounded-full" />
+            <Skeleton className="h-6 w-full rounded-md" />
+          </div>
+        </div>
+      }
+    >
+      <GlobalSearchContent />
+    </Suspense>
   );
 };
 

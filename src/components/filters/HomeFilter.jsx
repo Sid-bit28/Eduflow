@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Button } from '../ui/button';
 import { cn, formUrlQuery } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Skeleton } from '../ui/skeleton';
 
-const HomeFilter = ({ filters }) => {
+const HomeFilterContent = ({ filters }) => {
   const searchParams = useSearchParams();
-  const [active, setActive] = useState('');
   const router = useRouter();
+  const [active, setActive] = useState('');
 
   const handleTypeClick = item => {
-    console.log(item);
     if (active === item) {
       setActive('');
       const newURL = formUrlQuery({
@@ -19,7 +19,6 @@ const HomeFilter = ({ filters }) => {
         key: 'filter',
         value: null,
       });
-
       router.push(newURL, { scroll: false });
     } else {
       setActive(item);
@@ -36,7 +35,7 @@ const HomeFilter = ({ filters }) => {
     <div className="mt-10 hidden flex-wrap gap-3 sm:flex">
       {filters.map(filter => (
         <Button
-          key={filter.name}
+          key={filter.value}
           className={cn(
             `body-medium rounded-lg px-6 py-3 capitalize shadow-none cursor-pointer`,
             active === filter.value
@@ -49,6 +48,22 @@ const HomeFilter = ({ filters }) => {
         </Button>
       ))}
     </div>
+  );
+};
+
+const HomeFilter = ({ filters }) => {
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-10 hidden flex-wrap gap-3 sm:flex">
+          {filters.map(filter => (
+            <Skeleton key={filter.value} className="h-11 w-24 rounded-lg" />
+          ))}
+        </div>
+      }
+    >
+      <HomeFilterContent filters={filters} />
+    </Suspense>
   );
 };
 

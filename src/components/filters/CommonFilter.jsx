@@ -1,7 +1,7 @@
 'use client';
 
 import { cn, formUrlQuery } from '@/lib/utils';
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   Select,
   SelectContent,
@@ -11,8 +11,9 @@ import {
   SelectValue,
 } from '../ui/select';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Skeleton } from '../ui/skeleton';
 
-const CommonFilter = ({ filters, otherClasses, containerClasses }) => {
+const CommonFilterContent = ({ filters, otherClasses, containerClasses }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -26,6 +27,7 @@ const CommonFilter = ({ filters, otherClasses, containerClasses }) => {
     });
     router.push(newURL, { scroll: false });
   };
+
   return (
     <div className={cn('relative', containerClasses)}>
       <Select
@@ -59,6 +61,24 @@ const CommonFilter = ({ filters, otherClasses, containerClasses }) => {
         </SelectContent>
       </Select>
     </div>
+  );
+};
+
+const CommonFilter = ({ filters, otherClasses, containerClasses }) => {
+  return (
+    <Suspense
+      fallback={
+        <div className={cn('relative', containerClasses)}>
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+      }
+    >
+      <CommonFilterContent
+        filters={filters}
+        otherClasses={otherClasses}
+        containerClasses={containerClasses}
+      />
+    </Suspense>
   );
 };
 
