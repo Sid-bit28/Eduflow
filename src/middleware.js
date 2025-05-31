@@ -55,6 +55,8 @@ export const config = {
     '/sign-up',
     '/ask-question',
     '/collection',
+    '/community/(.*)',
+    '/jobs',
     '/questions',
     '/questions/(.*)',
     '/profile/(.*)',
