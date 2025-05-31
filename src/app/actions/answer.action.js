@@ -48,7 +48,7 @@ const createAnswer = async params => {
       user: author,
       action: 'answer',
       question,
-      answer: new answer._id(),
+      answer: answer._id,
       tags: questionObject.tags,
     });
 
