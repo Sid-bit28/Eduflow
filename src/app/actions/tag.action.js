@@ -41,13 +41,14 @@ const getTopInteractedTags = async params => {
       return tags;
     }, []);
 
-    // Get diatinct tag ID's from the user's interactions
+    // Get distinct tag ID's from the user's interactions
     const distinctUserTagIds = [...new Set(userTags.map(tag => tag.id))];
-    console.log(distinctUserTagIds);
+    const topN = Math.min(distinctUserTagIds.length, 3);
+    const topDistinctUserTags = distinctUserTagIds.slice(0, topN);
 
     const tags = [];
 
-    for (const tagId of distinctUserTagIds) {
+    for (const tagId of topDistinctUserTags) {
       const tag = await TagModel.findById(tagId);
       if (tag) {
         tags.push(tag);

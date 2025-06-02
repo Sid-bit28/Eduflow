@@ -38,7 +38,7 @@ const SignIn = () => {
       toast.error(result.error);
     } else {
       toast.success('Login Successfully.');
-      router.push('/');
+      window.location.href = '/';
     }
     setIsLoading(false);
   }
