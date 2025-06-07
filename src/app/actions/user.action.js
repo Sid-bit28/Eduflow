@@ -453,7 +453,6 @@ const updateUser = async params => {
         error: 'userId, and updateData is required.',
       };
     }
-    console.log(userId, updateData);
     await UserModel.findOneAndUpdate({ _id: userId }, updateData, {
       new: true,
     });

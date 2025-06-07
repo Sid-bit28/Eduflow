@@ -28,7 +28,6 @@ const SignUp = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values) {
-    console.log(values);
     const payload = {
       name: values.name,
       email: values.email.toLowerCase(),

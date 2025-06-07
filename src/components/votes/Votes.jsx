@@ -54,9 +54,7 @@ const Votes = ({
           hasDownvoted,
           path: pathname,
         };
-        console.log(payLoad);
         const response = await upvoteQuestion(payLoad);
-        console.log(response);
         if (response?.success) {
           toast.success(response?.message);
           router.refresh();

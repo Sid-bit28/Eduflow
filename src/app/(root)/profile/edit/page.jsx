@@ -17,7 +17,6 @@ const Page = async ({ params }) => {
       throw new Error(getUserByIdResponse?.error || 'Internal Server Error');
     }
     const user = getUserByIdResponse?.user;
-    console.log('user', user);
     if (!user) {
       return {
         redirect: {

@@ -202,7 +202,6 @@ const upvoteQuestion = async params => {
     } else {
       updateQuery = { $addToSet: { upvotes: userId } };
     }
-    console.log(updateQuery);
 
     const question = await QuestionModel.findByIdAndUpdate(
       questionId,
@@ -216,7 +215,6 @@ const upvoteQuestion = async params => {
         error: 'Question not found.',
       };
     }
-    console.log(userId, question.author);
     // Increment author's reputation
 
     // Increment author's reputation by +1/-1 for upvoting/revoking an upvote to the question
@@ -338,7 +336,7 @@ const editQuestion = async params => {
     await connectDB();
 
     const { questionId, title, content, path } = params;
-    console.log(questionId, title);
+    (questionId, title);
     if (!questionId || !title || !content) {
       return {
         success: false,
@@ -354,7 +352,6 @@ const editQuestion = async params => {
       };
     }
 
-    console.log(question);
 
     question.title = title;
     question.content = content;

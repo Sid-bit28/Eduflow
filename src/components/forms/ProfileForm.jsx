@@ -48,7 +48,6 @@ const ProfileForm = ({ userId, user }) => {
         },
         path: pathname,
       };
-      console.log(payLoad);
       await updateUser(payLoad);
       setIsSubmitting(false);
       router.back();

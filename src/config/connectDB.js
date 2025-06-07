@@ -30,7 +30,6 @@ async function connectDB() {
   // Promise is available
   try {
     cached.conn = await cached.promise;
-    console.log('Database connected.');
   } catch (error) {
     cached.promise = null;
     throw error;
