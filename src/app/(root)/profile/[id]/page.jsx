@@ -12,7 +12,7 @@ import AnswerTab from '@/components/profile/AnswerTab';
 import ErrorComponent from '@/components/ErrorComponent';
 
 export const metadata = {
-  title: 'Profile | DevOverflow',
+  title: 'Profile | Eduflow',
   description:
     'A community-driven platform for asking and answering questions.',
 };

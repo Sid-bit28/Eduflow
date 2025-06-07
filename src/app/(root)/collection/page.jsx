@@ -10,9 +10,8 @@ import ROUTES from '@/constants/routes';
 import React from 'react';
 
 export const metadata = {
-  title: 'Saved Questions | DevOverflow',
-  description:
-    'A community-driven platform for asking and answering questions.',
+  title: 'Saved Questions | Eduflow',
+  description: 'Get to know about the community which will help you.',
 };
 
 const Page = async ({ searchParams }) => {

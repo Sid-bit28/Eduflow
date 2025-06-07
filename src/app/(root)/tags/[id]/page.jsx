@@ -8,7 +8,7 @@ import ROUTES from '@/constants/routes';
 import React from 'react';
 
 export const metadata = {
-  title: 'Tag | DevOverflow',
+  title: 'Tag | Eduflow',
   description:
     'A community-driven platform for asking and answering questions.',
 };

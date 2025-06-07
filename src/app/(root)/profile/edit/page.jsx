@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import React from 'react';
 
 export const metadata = {
-  title: 'Edit Profile | DevOverflow',
+  title: 'Edit Profile | Eduflow',
   description: 'Edit your profile and get answers from the community.',
 };
 

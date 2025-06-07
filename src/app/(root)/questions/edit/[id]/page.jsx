@@ -5,7 +5,7 @@ import QuestionForm from '@/components/forms/QuestionForm';
 import React from 'react';
 
 export const metadata = {
-  title: 'Edit Question | DevOverflow',
+  title: 'Edit Question | Eduflow',
   description: 'Edit your question and get answers from the community.',
 };
 

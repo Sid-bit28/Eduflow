@@ -10,7 +10,7 @@ import ErrorComponent from '@/components/ErrorComponent';
 import Pagination from '@/components/Pagination';
 
 export const metadata = {
-  title: 'Tags | DevOverflow',
+  title: 'Tags | Eduflow',
   description:
     'A community-driven platform for asking and answering questions.',
 };

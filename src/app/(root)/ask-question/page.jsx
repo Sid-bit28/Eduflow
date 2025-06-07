@@ -3,7 +3,7 @@ import QuestionForm from '@/components/forms/QuestionForm';
 import React from 'react';
 
 export const metadata = {
-  title: 'Ask a Question | DevOverflow',
+  title: 'Ask a Question | Eduflow',
   description: 'Ask a question and get answers from the community.',
 };
 

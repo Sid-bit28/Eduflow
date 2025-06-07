@@ -10,7 +10,7 @@ import Link from 'next/link';
 import React from 'react';
 
 export const metadata = {
-  title: 'Community | DevOverflow',
+  title: 'Community | Eduflow',
   description:
     'A community-driven platform for asking and answering questions.',
 };

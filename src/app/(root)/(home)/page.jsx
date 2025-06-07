@@ -16,7 +16,7 @@ import Link from 'next/link';
 import React from 'react';
 
 export const metadata = {
-  title: 'Home | DevOverflow',
+  title: 'Home | Eduflow',
   description:
     'A community-driven platform for asking and answering questions.',
 };
